@@ -36,7 +36,53 @@ MONEY_MADE = 0.0
 
 #Methods
 
+def MoveCustomer(customerToMove, storeShelves, allCustomers):
+    """
+    MoveCustomer
+    attempts to move a customer towards their next primary item
+    the way customer movement works is as follows:
+    the first action is to compare the customer position against all other
+    customer positions, shelf positions, and shop boundaries to figure out
+    which directions are available to move in.
+    
+    The next action is to find the coordinates of the closest primary item
+    
+    after these coordinates are found, the Y-axis position of the item and
+    customer are compared. if the difference between positions is 1, then
+    moving in the Y-direction will be ignored. otherwise the customer will
+    attempt to move in the Y-direction if possible.
+    
+    if the customer does not move in the Y-axis, they will instead to move
+    in the X direction. If Y-axis movement was ignored before this, that is
+    to say, that the customer is aligned in the Y-axis to purchase the item,
+    then the customer will attempt to move in the direction of the item.
+    If the customer is not Y-axis aligned, it will instead choose to move in
+    the direction of the closest shop boundary, if possible.
+    
+    if all attempted movement options have been prevented by this point,
+    then the customer will attempt to move in any direction, chosen at random
+    
+    If the customer is blocked in all directions, it will stay still
+    
+    
+    this movement pattern assumes that the shop is created with horizontal
+    (parallel to X-axis) shelves, and that none of the shelves create corners
+    with each other.
+    """
+    customerCoords = customerToMove.loc_in_env
+    #determine blocked directions
+    for i in storeShelves:
+        
+    for i in allCustomers:
+        
 
+def CustomerPurchase(customerToPurchase, storeShelves):
+    """
+    CustomerPurchase
+    attempts to purchase items around the customer, if they are in the
+    customer's primary or secondary item lists
+    """
+    
 #Classes
 
 class Item(object):
