@@ -7,6 +7,7 @@
 #Import statements
 
 import numpy as np
+import random
 
 #Constants
 
@@ -73,18 +74,176 @@ def MoveCustomer(customerToMove, storeShelves, allCustomers):
     """
     customerCoords = customerToMove.loc_in_env
     #determine blocked directions
+    blockedDirections = np.zeros(4, dtype=bool) #0123 = NESW
+    #boundaries
+    if(customerCoords[0] == 0):
+        blockedDirections[0] = True
+    if(customerCoords[0] == STORE_SIZE - 1):
+        blockedDirections[2] = True
+    if(customerCoords[1] == 0):
+        blockedDirections[3] = True
+    if(customerCoords[1] == STORE_SIZE - 1):
+        blockedDirections[1] = True
+    #store shelves
     for i in storeShelves:
-        pass
+        shelfLoc = i.loc_in_env
+        diff = customerCoords - shelfLoc
+        if(diff[0] == -1 and diff[1] == 0):
+            blockedDirections[0] = True
+        if(diff[0] == 1 and diff[1] == 0):
+            blockedDirections[2] = True
+        if(diff[0] == 0 and diff[1] == -1):
+            blockedDirections[3] = True
+        if(diff[0] == 0 and diff[1] == 1):
+            blockedDirections[1] = True
+    #customers
     for i in allCustomers:
-        pass
-        
+        otherCustomerLoc = i.loc_in_env
+        diff = customerCoords - otherCustomerLoc
+        if(diff[0] == -1 and diff[1] == 0):
+            blockedDirections[0] = True
+        if(diff[0] == 1 and diff[1] == 0):
+            blockedDirections[2] = True
+        if(diff[0] == 0 and diff[1] == -1):
+            blockedDirections[3] = True
+        if(diff[0] == 0 and diff[1] == 1):
+            blockedDirections[1] = True
+    #do nothing if we cannot move
+    if(blockedDirections[0] and blockedDirections[1] and blockedDirections[2] and blockedDirections[3]):
+        return
+    
+    #find the closest primary item
+    closestShelf = None
+    closestDistance = np.array([STORE_SIZE, STORE_SIZE])
+    for i in storeShelves:
+        notPrimaryItem = True
+        for j in customerToMove.primary_list:
+            if(j.name == i.stock.name):
+                notPrimaryItem = False
+        if(notPrimaryItem):
+            continue
+        else:
+            shelfCoords = i.loc_in_env
+            shelfDist = np.abs(customerCoords - shelfCoords)
+            newC = (shelfDist[0] * shelfDist[0]) + (shelfDist[1] * shelfDist[1])
+            oldC = (closestDistance[0] * closestDistance[0]) + (closestDistance[1] * closestDistance[1])
+            #if this shelf is closer
+            if(oldC > newC):
+                closestShelf = i
+                closestDistance = shelfDist
+    
+    #attempt to move vertically
+    shelfVector = customerCoords - closestShelf.loc_in_env
+    if(shelfVector[0] > 1 and not blockedDirections[0]):
+        #move north
+        customerCoords[0] = customerCoords[0] - 1
+        customerToMove.loc_in_env = customerCoords
+        return
+    if(shelfVector[0] < -1 and not blockedDirections[2]):
+        #move south
+        customerCoords[0] = customerCoords[0] + 1
+        customerToMove.loc_in_env = customerCoords
+        return
+    
+    #attempt to move horizontally
+    if(shelfVector[1] > 1 and not blockedDirections[3]):
+        #move west
+        customerCoords[1] = customerCoords[1] - 1
+        customerToMove.loc_in_env = customerCoords
+        return
+    if(shelfVector[1] < -1 and not blockedDirections[1]):
+        #move east
+        customerCoords[1] = customerCoords[1] + 1
+        customerToMove.loc_in_env = customerCoords
+        return
+    
+    #otherwise move randomly
+    randomDirection = GetRandDirection(blockedDirections)
+    if(randomDirection == 0):
+        #move north
+        customerCoords[0] = customerCoords[0] - 1
+        customerToMove.loc_in_env = customerCoords
+        return
+    if(randomDirection == 1):
+        #move east
+        customerCoords[1] = customerCoords[1] + 1
+        customerToMove.loc_in_env = customerCoords
+        return
+    if(randomDirection == 2):
+        #move south
+        customerCoords[0] = customerCoords[0] + 1
+        customerToMove.loc_in_env = customerCoords
+        return
+    if(randomDirection == 3):
+        #move west
+        customerCoords[1] = customerCoords[1] - 1
+        customerToMove.loc_in_env = customerCoords
+        return
+
+def GetRandDirection(blockedDirections):
+    """
+    GetRandDirection
+    this function will take a numpy array of blocked directions, and return
+    a direction chosen randomly from those allowed.
+    the directions correspond by an integer 0,1,2,3 to a cardinal direction
+    north,east,south,west, respectively
+    
+    blockedDirections is assumed to be a 1D numpy array with four booleans
+    
+    this function returns an integer direction
+    """
+    randomDirection = random.randint(0,3)
+    if(blockedDirections[randomDirection]):
+        return GetRandDirection(blockedDirections)
+    else:
+        return randomDirection
 
 def CustomerPurchase(customerToPurchase, storeShelves):
     """
     CustomerPurchase
     attempts to purchase items around the customer, if they are in the
-    customer's primary or secondary item lists
+    customer's primary or secondary item lists.
+    The customer can only pull from shelves which are VIEW_RANGE or closer
+    steps away (including diagonal steps)
+    if an item is purchased, then ITEMS_SOLD will increment by one, and
+    MONEY_MADE will increment by the cost of the item.
+    
+    customerToPurchase should be a customer object to search for
+    storeShelves should be a numpy array of all shelves in the store
     """
+    global ITEMS_SOLD
+    global MONEY_MADE
+    for i in storeShelves:
+        distance = np.abs(customerToPurchase.loc_in_env - i.loc_in_env)
+        #shelf in range
+        if(distance[0] <= VIEW_RANGE and distance[1] <= VIEW_RANGE):
+            for j in customerToPurchase.primary_list:
+                #item customer wants
+                if(j.name == i.stock.name):
+                    #remove item
+                    newList = []
+                    for k in customerToPurchase.primary_list:
+                        #add into the list if not being removed
+                        if(not j == k):
+                            newList.append(k)
+                    customerToPurchase.primary_list = np.array(newList)
+                    #increment counters
+                    ITEMS_SOLD = ITEMS_SOLD + 1
+                    MONEY_MADE = MONEY_MADE + j.price
+            for j in customerToPurchase.secondary_list:
+                #item customer wants
+                if(j.name == i.stock.name):
+                    #remove item
+                    newList = []
+                    for k in customerToPurchase.secondary_list:
+                        #add into the list if not being removed
+                        if(not j == k):
+                            newList.append(k)
+                    customerToPurchase.primary_list = np.array(newList)
+                    #increment counters
+                    ITEMS_SOLD = ITEMS_SOLD + 1
+                    MONEY_MADE = MONEY_MADE + j.price
+            
     
 #Classes
 
