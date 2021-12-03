@@ -5,9 +5,11 @@
 """
 
 #Import statements
+
 import numpy as np
 
 #Constants
+
 #numpy array of items representing the pool of primary items customers can have
 #numpy array of items representing the pool of secondary items customers can have
 #numpy array of items representing the pool of all items customers can have
@@ -72,8 +74,9 @@ def MoveCustomer(customerToMove, storeShelves, allCustomers):
     customerCoords = customerToMove.loc_in_env
     #determine blocked directions
     for i in storeShelves:
-        
+        pass
     for i in allCustomers:
+        pass
         
 
 def CustomerPurchase(customerToPurchase, storeShelves):
@@ -109,3 +112,14 @@ class Customer(object):
         
         self.primary_list = pl_init
         self.secondary_list = sl_init
+
+class Shelf(object):
+    """
+    Shelf
+    class containing a reference to the item which is represented
+    and a pair of integers representing the position in the store of the item.
+    """
+    def __init__(self, stockedItem, x_init=0, y_init=0):
+        self.loc_in_env = np.array([x_init, y_init])
+        self.stock = stockedItem
+
