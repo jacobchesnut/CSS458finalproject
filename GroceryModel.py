@@ -77,6 +77,7 @@ def MoveCustomer(customerToMove, storeShelves, allCustomers):
     (parallel to X-axis) shelves, and that none of the shelves create corners
     with each other.
     """
+    global CUSTOMER_STEPS
     customerCoords = customerToMove.loc_in_env
     #determine blocked directions
     blockedDirections = np.zeros(4, dtype=bool) #0123 = NESW
@@ -143,11 +144,13 @@ def MoveCustomer(customerToMove, storeShelves, allCustomers):
         #move north
         customerCoords[0] = customerCoords[0] - 1
         customerToMove.loc_in_env = customerCoords
+        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     if(shelfVector[0] < -1 and not blockedDirections[2]):
         #move south
         customerCoords[0] = customerCoords[0] + 1
         customerToMove.loc_in_env = customerCoords
+        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     
     #attempt to move horizontally
@@ -155,11 +158,13 @@ def MoveCustomer(customerToMove, storeShelves, allCustomers):
         #move west
         customerCoords[1] = customerCoords[1] - 1
         customerToMove.loc_in_env = customerCoords
+        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     if(shelfVector[1] < -1 and not blockedDirections[1]):
         #move east
         customerCoords[1] = customerCoords[1] + 1
         customerToMove.loc_in_env = customerCoords
+        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     
     #otherwise move randomly
@@ -168,21 +173,25 @@ def MoveCustomer(customerToMove, storeShelves, allCustomers):
         #move north
         customerCoords[0] = customerCoords[0] - 1
         customerToMove.loc_in_env = customerCoords
+        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     if(randomDirection == 1):
         #move east
         customerCoords[1] = customerCoords[1] + 1
         customerToMove.loc_in_env = customerCoords
+        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     if(randomDirection == 2):
         #move south
         customerCoords[0] = customerCoords[0] + 1
         customerToMove.loc_in_env = customerCoords
+        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     if(randomDirection == 3):
         #move west
         customerCoords[1] = customerCoords[1] - 1
         customerToMove.loc_in_env = customerCoords
+        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
 
 def GetRandDirection(blockedDirections):
@@ -320,8 +329,35 @@ def RunOneHundredSimulations(shelves):
     numpy array where a[0] = average items sold, a[1] = average money earned,
     and a[2] = average distance walked.
     """
-    
-        
+    averageItemsSold = 0
+    averageMoneyEarned = 0.0
+    averageDistanceWalked = 0
+    for i in range(100):
+        RunOneSimulation(shelves)
+        averageItemsSold = averageItemsSold + ITEMS_SOLD
+        averageMoneyEarned = averageMoneyEarned + MONEY_MADE
+        averageDistanceWalked = averageDistanceWalked + CUSTOMER_STEPS
+    averageItemsSold = averageItemsSold/100
+    averageMoneyEarned = averageMoneyEarned/100
+    averageDistanceWalked = averageDistanceWalked/100
+    return np.array([averageItemsSold, averageMoneyEarned, averageDistanceWalked])
+
+def RunRandomizedSimulations():
+    """
+    RunRandomizedSimulations
+    runs five sets of one hundred simulations with a different item layout for
+    each set of simulations, outputting the results of each, paired with the
+    item layout of the store.
+    """
+    for i in range(5):
+        #create shelves for the store here
+        shelves = initshelves
+        averages = RunOneHundredSimulations(shelves)
+        print("For simulation " + str(i) + ":")
+        #print out shelf contents information here
+        print("The average items sold was " + str(averages[0]) + ".")
+        print("The average money earned was " + str(averages[1]) + ".")
+        print("The average distance walked was " + str(averages[2]) + ".")
     
  
     def initItems():
