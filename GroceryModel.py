@@ -21,7 +21,7 @@ DELTA_CUSTOMER = 5
 #int representing the total number of customers which can enter the store
 TOTAL_CUSTOMERS = 30
 #int representing the size of the array which will represent the store
-STORE_SIZE = 20
+STORE_SIZE = 10
 #int representing the number of steps which can pass before forcibly ending the simulation
 MAX_TIME = 500
 #int representing the number of items a customer will have in their primary list
@@ -243,7 +243,80 @@ def CustomerPurchase(customerToPurchase, storeShelves):
                     #increment counters
                     ITEMS_SOLD = ITEMS_SOLD + 1
                     MONEY_MADE = MONEY_MADE + j.price
-            
+
+def RemoveCustomers(allCustomers):
+    """
+    RemoveCustomers
+    removes all customers from the customer list which do not have primary
+    items to search for anymore.
+    
+    allCustomers should be a numpy array of all customers in the simulation,
+    returns a numpy array of all remaining customers which still have primary
+    items to search for
+    """
+    returnArray = allCustomers
+    for i in range(allCustomers):
+        newList = []
+        if(i.primary_list.size == 0):
+            for j in range(allCustomers):
+                if(not i == j):
+                    newList.append(j)
+            returnArray = np.array(newList)
+    return returnArray
+
+def RunOneSimulation(shelves):
+    """
+    RunOneSimulation
+    takes a numpy array of shelves representing a store, and runs a single
+    simulation by creating a list of shoppers (without a probability density),
+    looping through moving the customers and purchasing items, with customers
+    being placed into the store every set amount of steps.
+    
+    shelves should be a numpy array of shelves representing the store to
+    simulate.
+    The results are kept in the global result variables.
+    """
+    #initialize items possibly
+    customerList = CreateCustomerList()
+    activeCustomerList = None
+    customerCounter = 0 #current customer to pull from customer list
+    counter = 0 #step number in store
+    global CUSTOMER_STEPS
+    global ITEMS_SOLD
+    global MONEY_MADE
+    CUSTOMER_STEPS = 0
+    ITEMS_SOLD = 0
+    MONEY_MADE = 0.0
+    #main simulation loop
+    while(counter < MAX_TIME):
+        #time to add a new customer
+        if((counter % DELTA_CUSTOMER) == 0 and customerCounter < TOTAL_CUSTOMERS - 1):
+            if(activeCustomerList is None):
+                activeCustomerList = np.array([customerList[customerCounter]])
+                customerCounter = customerCounter + 1
+            else:
+                newList = []
+                for i in range(activeCustomerList):
+                    newList.append(i)
+                newList.append(customerList[customerCounter])
+                customerCounter = customerCounter + 1
+                activeCustomerList = np.array(newList)
+        #loop through all customers
+        for i in range(activeCustomerList):
+            MoveCustomer(i, shelves, activeCustomerList)
+            CustomerPurchase(i, shelves)
+        RemoveCustomers(activeCustomerList)
+
+def RunOneHundredSimulations(shelves):
+    """
+    RunOneHundredSimulations
+    takes a numpy array of shelves representing a store and runs one hundred
+    single simulations, averaging and returning the results as floats in a
+    numpy array where a[0] = average items sold, a[1] = average money earned,
+    and a[2] = average distance walked.
+    """
+    
+        
     
 #Classes
 
