@@ -32,7 +32,8 @@ NUMBER_SECONDARY_LIST = 7
 PRIMARY_LIST = []
 #array of item that will be used in generating the secondary list
 SECONDARY_LIST = []
-
+#array of x and y value for spawner location
+SPAWNER = [0,0]
 
 #Global return values
 #int representing the number of steps made in the current simulation
@@ -77,7 +78,6 @@ def MoveCustomer(customerToMove, storeShelves, allCustomers):
     (parallel to X-axis) shelves, and that none of the shelves create corners
     with each other.
     """
-    global CUSTOMER_STEPS
     customerCoords = customerToMove.loc_in_env
     #determine blocked directions
     blockedDirections = np.zeros(4, dtype=bool) #0123 = NESW
@@ -144,13 +144,11 @@ def MoveCustomer(customerToMove, storeShelves, allCustomers):
         #move north
         customerCoords[0] = customerCoords[0] - 1
         customerToMove.loc_in_env = customerCoords
-        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     if(shelfVector[0] < -1 and not blockedDirections[2]):
         #move south
         customerCoords[0] = customerCoords[0] + 1
         customerToMove.loc_in_env = customerCoords
-        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     
     #attempt to move horizontally
@@ -158,13 +156,11 @@ def MoveCustomer(customerToMove, storeShelves, allCustomers):
         #move west
         customerCoords[1] = customerCoords[1] - 1
         customerToMove.loc_in_env = customerCoords
-        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     if(shelfVector[1] < -1 and not blockedDirections[1]):
         #move east
         customerCoords[1] = customerCoords[1] + 1
         customerToMove.loc_in_env = customerCoords
-        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     
     #otherwise move randomly
@@ -173,25 +169,21 @@ def MoveCustomer(customerToMove, storeShelves, allCustomers):
         #move north
         customerCoords[0] = customerCoords[0] - 1
         customerToMove.loc_in_env = customerCoords
-        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     if(randomDirection == 1):
         #move east
         customerCoords[1] = customerCoords[1] + 1
         customerToMove.loc_in_env = customerCoords
-        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     if(randomDirection == 2):
         #move south
         customerCoords[0] = customerCoords[0] + 1
         customerToMove.loc_in_env = customerCoords
-        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     if(randomDirection == 3):
         #move west
         customerCoords[1] = customerCoords[1] - 1
         customerToMove.loc_in_env = customerCoords
-        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
 
 def GetRandDirection(blockedDirections):
@@ -291,7 +283,7 @@ def RunOneSimulation(shelves):
     The results are kept in the global result variables.
     """
     #initialize items possibly
-    customerList = CreateCustomerList()
+    customerList = createCustomerList(TOTAL_CUSTOMERS, None, None)
     activeCustomerList = None
     customerCounter = 0 #current customer to pull from customer list
     counter = 0 #step number in store
@@ -329,112 +321,95 @@ def RunOneHundredSimulations(shelves):
     numpy array where a[0] = average items sold, a[1] = average money earned,
     and a[2] = average distance walked.
     """
-    averageItemsSold = 0
-    averageMoneyEarned = 0.0
-    averageDistanceWalked = 0
-    for i in range(100):
-        RunOneSimulation(shelves)
-        averageItemsSold = averageItemsSold + ITEMS_SOLD
-        averageMoneyEarned = averageMoneyEarned + MONEY_MADE
-        averageDistanceWalked = averageDistanceWalked + CUSTOMER_STEPS
-    averageItemsSold = averageItemsSold/100
-    averageMoneyEarned = averageMoneyEarned/100
-    averageDistanceWalked = averageDistanceWalked/100
-    return np.array([averageItemsSold, averageMoneyEarned, averageDistanceWalked])
-
-def RunRandomizedSimulations():
-    """
-    RunRandomizedSimulations
-    runs five sets of one hundred simulations with a different item layout for
-    each set of simulations, outputting the results of each, paired with the
-    item layout of the store.
-    """
-    for i in range(5):
-        #create shelves for the store here
-        shelves = initshelves
-        averages = RunOneHundredSimulations(shelves)
-        print("For simulation " + str(i) + ":")
-        #print out shelf contents information here
-        print("The average items sold was " + str(averages[0]) + ".")
-        print("The average money earned was " + str(averages[1]) + ".")
-        print("The average distance walked was " + str(averages[2]) + ".")
+    
+        
     
  
-    def initItems():
-        """        
-        takes a numpy array of strings and a numpy array of floats, which 
-        paired together represent an item. Returns a numpy array of all items 
-        created from this.
-        """
-        #2017 prices for common grocery items. source https://www.visualcapitalist.com/decade-grocery-prices/
-        PRIMARY_LIST.append(Item('Bacon', 5.79)) 
-        PRIMARY_LIST.append(Item('Pasta', 1.28)) 
-        PRIMARY_LIST.append(Item('Beans', 1.36))         
-        PRIMARY_LIST.append(Item('Ground Beef', 4.12)) 
-        PRIMARY_LIST.append(Item('Flour', 0.52)) 
-        PRIMARY_LIST.append(Item('Peanut Butter', 2.56)) 
-        PRIMARY_LIST.append(Item('Potatoes', 0.72)) 
-        PRIMARY_LIST.append(Item('Rice', 0.72)) 
-        PRIMARY_LIST.append(Item('Sugar', 0.65)) 
-        PRIMARY_LIST.append(Item('Milk', 3.24)) 
-        PRIMARY_LIST.append(Item('Eggs', 1.6)) #made up price
-        PRIMARY_LIST.append(Item('Water', 1.1)) #made up price
-        PRIMARY_LIST.append(Item('Pet Food', 4.63)) #made up price
+def initItems():
+    """        
+    takes a numpy array of strings and a numpy array of floats, which 
+    paired together represent an item. Returns a numpy array of all items 
+    created from this.
+    """
+    #2017 prices for common grocery items. source https://www.visualcapitalist.com/decade-grocery-prices/
+    PRIMARY_LIST.append(Item('Bacon', 5.79)) 
+    PRIMARY_LIST.append(Item('Pasta', 1.28)) 
+    PRIMARY_LIST.append(Item('Beans', 1.36))         
+    PRIMARY_LIST.append(Item('Ground Beef', 4.12)) 
+    PRIMARY_LIST.append(Item('Flour', 0.52)) 
+    PRIMARY_LIST.append(Item('Peanut Butter', 2.56)) 
+    PRIMARY_LIST.append(Item('Potatoes', 0.72)) 
+    PRIMARY_LIST.append(Item('Rice', 0.72)) 
+    PRIMARY_LIST.append(Item('Sugar', 0.65)) 
+    PRIMARY_LIST.append(Item('Milk', 3.24)) 
+    PRIMARY_LIST.append(Item('Eggs', 1.6)) #made up price
+    PRIMARY_LIST.append(Item('Water', 1.1)) #made up price
+    PRIMARY_LIST.append(Item('Pet Food', 4.63)) #made up price
+     
+    #Secondary items. Makeing stuff up rn
+    SECONDARY_LIST.append(Item('Chips', 2.50))
+    SECONDARY_LIST.append(Item('Soda', 1.22))
+    SECONDARY_LIST.append(Item('Gum', 0.76))
+    SECONDARY_LIST.append(Item('Chocolate', 1.02))
+    SECONDARY_LIST.append(Item('Ice Cream', 4.70))
+    SECONDARY_LIST.append(Item('Fizzy Water', 2.50))
+    SECONDARY_LIST.append(Item('Carrot', 3.22))
+    SECONDARY_LIST.append(Item('Cake', 10.45))
+    SECONDARY_LIST.append(Item('Cookies', 5.78))
+    SECONDARY_LIST.append(Item('Beer', 4.20))
+    SECONDARY_LIST.append(Item('Cooking Wine', 8.00))
+    SECONDARY_LIST.append(Item('Doughnut', 1.41))
+    SECONDARY_LIST.append(Item('Chicken Nuggets', 5.80))
+    SECONDARY_LIST.append(Item('Fries', 3.69))
+    SECONDARY_LIST.append(Item('Cheese', 1.98))
+    SECONDARY_LIST.append(Item('Rice Noodles', 5.78))
+    SECONDARY_LIST.append(Item('Jelly', 3.12))
+    SECONDARY_LIST.append(Item('Juice', 4.90))
+    SECONDARY_LIST.append(Item('Brownies', 1.94))
+    SECONDARY_LIST.append(Item('Pizza', 6.66))  
         
-        #Secondary items. Makeing stuff up rn
-        SECONDARY_LIST.append(Item('Chips', 2.50))
-        SECONDARY_LIST.append(Item('Soda', 1.22))
-        SECONDARY_LIST.append(Item('Gum', 0.76))
-        SECONDARY_LIST.append(Item('Chocolate', 1.02))
-        SECONDARY_LIST.append(Item('Ice Cream', 4.70))
-        SECONDARY_LIST.append(Item('Fizzy Water', 2.50))
-        SECONDARY_LIST.append(Item('Carrot', 3.22))
-        SECONDARY_LIST.append(Item('Cake', 10.45))
-        SECONDARY_LIST.append(Item('Cookies', 5.78))
-        SECONDARY_LIST.append(Item('Beer', 4.20))
-        SECONDARY_LIST.append(Item('Cooking Wine', 8.00))
-        SECONDARY_LIST.append(Item('Doughnut', 1.41))
-        SECONDARY_LIST.append(Item('Chicken Nuggets', 5.80))
-        SECONDARY_LIST.append(Item('Fries', 3.69))
-        SECONDARY_LIST.append(Item('Cheese', 1.98))
-        SECONDARY_LIST.append(Item('Rice Noodles', 5.78))
-        SECONDARY_LIST.append(Item('Jelly', 3.12))
-        SECONDARY_LIST.append(Item('Juice', 4.90))
-        SECONDARY_LIST.append(Item('Brownies', 1.94))
-        SECONDARY_LIST.append(Item('Pizza', 6.66))
-        
-        
-    def createStore():
-        """
-        createStore: takes a 2D numpy array of coordinates (a[0,:] = x coords. 
-        A[1,:] = y coords), and returns a numpy array of shelves created in
-        each coordinate, with a random item per shelf.
-        """
-        lol = 1
-    def createCustomer():
-        """
-        takes a numpy array of primary items, a numpy array of secondary items,
-        a numpy array of floats representing percentages in an item density 
-        for primary items (defaults to None if unused), and a numpy array of 
-        floats representing percentages in an item density for secondary items
-        (defaults to None if unused). Returns a single Customer created from 
-        this information, with primary and secondary items chosen based off of
-        random selection (with the probability density if provided) up to the
-        number specified in the constants. 
+def createStore(loc = []):
+    """
+    createStore: takes a 2D numpy array of coordinates (a[0,:] = x coords. 
+    A[1,:] = y coords), and returns a numpy array of shelves created in
+    each coordinate, with a random item per shelf.
+    """
+    for i in len(loc):
+        lol =1
+            
+def createCustomer(prim = [], sec = [], percPrim = [], percSec = []):
+    """
+    takes a numpy array of primary items, a numpy array of secondary items,
+    a numpy array of floats representing percentages in an item density 
+    for primary items (defaults to None if unused), and a numpy array of 
+    floats representing percentages in an item density for secondary items
+    (defaults to None if unused). Returns a single Customer created from 
+    this information, with primary and secondary items chosen based off of
+    random selection (with the probability density if provided) up to the
+    number specified in the constants. 
+    """
+    custPrimList = []
+    custSecList = []
+    
+    #NEED WORK
+       
+    return Customer(SPAWNER[0], SPAWNER[1], custPrimList, custSecList)
 
-        """
-        lol = 1
-    def createCustomerList():
-        """
-        createCustomerList: takes an integer for the number of customers to 
-        create, a numpy array of floats representing percentages in an item
-        density for primary items (defaults to None if unused), and a numpy
-        array of floats representing percentages in an item density for 
-        secondary items (defaults to None if unused).  returns a numpy array 
-        of that many Customers, using the densities if given.
-
-        """
-        lol = 1
+def createCustomerList(custAmount, percPrim = [], percSec = []):
+    """
+    createCustomerList: takes an integer for the number of customers to 
+    create, a numpy array of floats representing percentages in an item
+    density for primary items (defaults to None if unused), and a numpy
+    array of floats representing percentages in an item density for 
+    secondary items (defaults to None if unused).  returns a numpy array 
+    of that many Customers, using the densities if given.
+    """
+    custList = []
+    for i in range(custAmount):
+        custList.append(createCustomer(PRIMARY_LIST, SECONDARY_LIST, 
+                                           percPrim = [], percSec = []))
+        
+    return custList
 
 #Classes
 
