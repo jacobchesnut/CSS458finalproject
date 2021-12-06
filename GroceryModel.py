@@ -321,7 +321,35 @@ def RunOneHundredSimulations(shelves):
     numpy array where a[0] = average items sold, a[1] = average money earned,
     and a[2] = average distance walked.
     """
-    
+    averageItemsSold = 0
+    averageMoneyEarned = 0.0
+    averageDistanceWalked = 0
+    for i in range(100):
+        RunOneSimulation(shelves)
+        averageItemsSold = averageItemsSold + ITEMS_SOLD
+        averageMoneyEarned = averageMoneyEarned + MONEY_MADE
+        averageDistanceWalked = averageDistanceWalked + CUSTOMER_STEPS
+    averageItemsSold = averageItemsSold/100
+    averageMoneyEarned = averageMoneyEarned/100
+    averageDistanceWalked = averageDistanceWalked/100
+    return np.array([averageItemsSold, averageMoneyEarned, averageDistanceWalked])
+
+def RunRandomizedSimulations():
+    """
+    RunRandomizedSimulations
+    runs five sets of one hundred simulations with a different item layout for
+    each set of simulations, outputting the results of each, paired with the
+    item layout of the store.
+    """
+    for i in range(5):
+        #create shelves for the store here
+        shelves = initshelves
+        averages = RunOneHundredSimulations(shelves)
+        print("For simulation " + str(i) + ":")
+        #print out shelf contents information here
+        print("The average items sold was " + str(averages[0]) + ".")
+        print("The average money earned was " + str(averages[1]) + ".")
+        print("The average distance walked was " + str(averages[2]) + ".")
         
     
  
