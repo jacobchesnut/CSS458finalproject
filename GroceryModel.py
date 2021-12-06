@@ -9,6 +9,9 @@
 import numpy as np
 import random
 
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+
 #Constants
 
 #numpy array of items representing the pool of primary items customers can have
@@ -398,12 +401,22 @@ def initItems():
         
 def createStore(loc = []):
     """
-    createStore: takes a 2D numpy array of coordinates (a[0,:] = x coords. 
+    takes a 2D numpy array of coordinates (a[0,:] = x coords. 
     A[1,:] = y coords), and returns a numpy array of shelves created in
     each coordinate, with a random item per shelf.
     """
+    shelves = []
+    
+    #all items into a single list
+    allItems = np.concatenate(PRIMARY_LIST, SECONDARY_LIST)
+    
+    #randomly assign an item to each shelf and remove the item from the list
     for i in len(loc):
-        lol =1
+        val = np.random.randInt(0, len(loc))
+        shelves.append(Shelf(allItems[val], loc[i][0], loc[i][1]))
+        allItems[val].remove
+        
+    return shelves
             
 def createCustomer(prim = [], sec = [], percPrim = [], percSec = []):
     """
@@ -455,6 +468,32 @@ def createCustomerList(custAmount, percPrim = [], percSec = []):
                                            percPrim = [], percSec = []))
         
     return custList
+
+def plot(data1, data2, data3):
+    """plot Method
+
+    Method Arguments:
+    * data1 = shelves
+    * data2 = customers
+    * data3 = undefined overlay
+    
+    Function:
+    * plots the 3 arrays
+     
+
+    Output:
+    * nice animated chart
+
+    """
+    
+    #store = np.zeros(shape=(STORE_SIZE,STORE_SIZE))
+    
+    
+    plt.imshow(data1, cmap='Blues', interpolation='nearest')
+    plt.imshow(data2, cmap='summer', interpolation='nearest')
+    plt.imshow(data3, cmap='autumn', interpolation='nearest')
+    plt.show()
+
 
 #Classes
 
