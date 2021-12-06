@@ -28,6 +28,11 @@ MAX_TIME = 500
 NUMBER_PRIMARY_LIST = 3
 #int representing the number of itmes a customer will have in their secondary list
 NUMBER_SECONDARY_LIST = 7
+#array of item that will be used in generating the primary list
+PRIMARY_LIST = []
+#array of item that will be used in generating the secondary list
+SECONDARY_LIST = []
+
 
 #Global return values
 #int representing the number of steps made in the current simulation
@@ -318,6 +323,83 @@ def RunOneHundredSimulations(shelves):
     
         
     
+ 
+    def initItems():
+        """        
+        takes a numpy array of strings and a numpy array of floats, which 
+        paired together represent an item. Returns a numpy array of all items 
+        created from this.
+        """
+        #2017 prices for common grocery items. source https://www.visualcapitalist.com/decade-grocery-prices/
+        PRIMARY_LIST.append(Item('Bacon', 5.79)) 
+        PRIMARY_LIST.append(Item('Pasta', 1.28)) 
+        PRIMARY_LIST.append(Item('Beans', 1.36))         
+        PRIMARY_LIST.append(Item('Ground Beef', 4.12)) 
+        PRIMARY_LIST.append(Item('Flour', 0.52)) 
+        PRIMARY_LIST.append(Item('Peanut Butter', 2.56)) 
+        PRIMARY_LIST.append(Item('Potatoes', 0.72)) 
+        PRIMARY_LIST.append(Item('Rice', 0.72)) 
+        PRIMARY_LIST.append(Item('Sugar', 0.65)) 
+        PRIMARY_LIST.append(Item('Milk', 3.24)) 
+        PRIMARY_LIST.append(Item('Eggs', 1.6)) #made up price
+        PRIMARY_LIST.append(Item('Water', 1.1)) #made up price
+        PRIMARY_LIST.append(Item('Pet Food', 4.63)) #made up price
+        
+        #Secondary items. Makeing stuff up rn
+        SECONDARY_LIST.append(Item('Chips', 2.50))
+        SECONDARY_LIST.append(Item('Soda', 1.22))
+        SECONDARY_LIST.append(Item('Gum', 0.76))
+        SECONDARY_LIST.append(Item('Chocolate', 1.02))
+        SECONDARY_LIST.append(Item('Ice Cream', 4.70))
+        SECONDARY_LIST.append(Item('Fizzy Water', 2.50))
+        SECONDARY_LIST.append(Item('Carrot', 3.22))
+        SECONDARY_LIST.append(Item('Cake', 10.45))
+        SECONDARY_LIST.append(Item('Cookies', 5.78))
+        SECONDARY_LIST.append(Item('Beer', 4.20))
+        SECONDARY_LIST.append(Item('Cooking Wine', 8.00))
+        SECONDARY_LIST.append(Item('Doughnut', 1.41))
+        SECONDARY_LIST.append(Item('Chicken Nuggets', 5.80))
+        SECONDARY_LIST.append(Item('Fries', 3.69))
+        SECONDARY_LIST.append(Item('Cheese', 1.98))
+        SECONDARY_LIST.append(Item('Rice Noodles', 5.78))
+        SECONDARY_LIST.append(Item('Jelly', 3.12))
+        SECONDARY_LIST.append(Item('Juice', 4.90))
+        SECONDARY_LIST.append(Item('Brownies', 1.94))
+        SECONDARY_LIST.append(Item('Pizza', 6.66))
+        
+        
+    def createStore():
+        """
+        createStore: takes a 2D numpy array of coordinates (a[0,:] = x coords. 
+        A[1,:] = y coords), and returns a numpy array of shelves created in
+        each coordinate, with a random item per shelf.
+        """
+        lol = 1
+    def createCustomer():
+        """
+        takes a numpy array of primary items, a numpy array of secondary items,
+        a numpy array of floats representing percentages in an item density 
+        for primary items (defaults to None if unused), and a numpy array of 
+        floats representing percentages in an item density for secondary items
+        (defaults to None if unused). Returns a single Customer created from 
+        this information, with primary and secondary items chosen based off of
+        random selection (with the probability density if provided) up to the
+        number specified in the constants. 
+
+        """
+        lol = 1
+    def createCustomerList():
+        """
+        createCustomerList: takes an integer for the number of customers to 
+        create, a numpy array of floats representing percentages in an item
+        density for primary items (defaults to None if unused), and a numpy
+        array of floats representing percentages in an item density for 
+        secondary items (defaults to None if unused).  returns a numpy array 
+        of that many Customers, using the densities if given.
+
+        """
+        lol = 1
+
 #Classes
 
 class Item(object):
