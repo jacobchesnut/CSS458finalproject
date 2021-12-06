@@ -388,9 +388,26 @@ def createCustomer(prim = [], sec = [], percPrim = [], percSec = []):
     random selection (with the probability density if provided) up to the
     number specified in the constants. 
     """
-    custPrimList = []
-    custSecList = []
+    custPrimList = np.zeros(len(NUMBER_PRIMARY_LIST))
+    custSecList = np.zeros(len(NUMBER_SECONDARY_LIST))
     
+    #random generation with no percent distribution
+    
+    for i in range(len(custPrimList)):
+        val = np.random.randInt(0, len(prim))
+        custPrimList[i] = prim[val]
+    
+    for i in range(len(custSecList)):
+        val = np.random.randInt(0, len(prim))
+        custPrimList[i] = sec[val]
+        
+    """
+    lowerBoundRange = 0
+    val = np.random.uniform()
+    for i in len(percPrim):
+        if val <= percPrim[i] and val > lowerBoundRange:
+    """       
+        
     #NEED WORK
        
     return Customer(SPAWNER[0], SPAWNER[1], custPrimList, custSecList)
