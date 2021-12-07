@@ -36,7 +36,7 @@ PRIMARY_LIST = []
 #array of item that will be used in generating the secondary list
 SECONDARY_LIST = []
 #array of x and y value for spawner location
-SPAWNER = [0,0]
+SPAWNER = [9,8]
 
 #Global return values
 #int representing the number of steps made in the current simulation
@@ -113,7 +113,7 @@ def MoveCustomer(customerToMove, storeShelves, allCustomers):
     #store shelves
     for i in storeShelves:
         shelfLoc = i.loc_in_env
-        diff = customerCoords - shelfLoc
+        diff = shelfLoc - customerCoords
         if(diff[0] == -1 and diff[1] == 0):
             blockedDirections[0] = True
         if(diff[0] == 1 and diff[1] == 0):
@@ -125,7 +125,7 @@ def MoveCustomer(customerToMove, storeShelves, allCustomers):
     #customers
     for i in allCustomers:
         otherCustomerLoc = i.loc_in_env
-        diff = customerCoords - otherCustomerLoc
+        diff = otherCustomerLoc - customerCoords
         if(diff[0] == -1 and diff[1] == 0):
             blockedDirections[0] = True
         if(diff[0] == 1 and diff[1] == 0):
