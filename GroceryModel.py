@@ -621,7 +621,7 @@ def createCustomerList(custAmount, percPrim = [], percSec = []):
         
     return custList
 
-def runAnimatedSimulation(data1, data2, data3):
+def runAnimatedSimulation(data1, data3):
     """plot Method
 
     Method Arguments:
@@ -638,15 +638,21 @@ def runAnimatedSimulation(data1, data2, data3):
 
     """
     
+    #store layout
     store = np.zeros(shape=(STORE_SIZE,STORE_SIZE))
     for i in range(len(shelfPositions)):
         cords = shelfPositions[i]
         store[cords[0], cords[1]] = 1
                     
+    customers = np.zeros(shape=(STORE_SIZE,STORE_SIZE))
+    for i in range(len(data1)):
+        cords = data1[i].loc_in_env
+        customers[cords[0], cords[1]] = 1
+    cMask = np.ma.masked_where(customers == 0, customers)
     
     plt.imshow(store, cmap='Blues', interpolation='nearest')
-    plt.imshow(data2, cmap='summer', interpolation='nearest')
-    plt.imshow(data3, cmap='autumn', interpolation='nearest')
+    plt.imshow(cMask, cmap='summer', interpolation='nearest')
+    #plt.imshow(data3, cmap='autumn', interpolation='nearest')
     plt.show()
 
 
