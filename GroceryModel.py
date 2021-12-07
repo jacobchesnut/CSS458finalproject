@@ -550,28 +550,60 @@ def createCustomer(prim = [], sec = [], percPrim = [], percSec = []):
     """
     custPrimList = []
     custSecList = []
-    
     #random generation with no percent distribution
     #currently can generate duplicates
-    
+    """
+PRIMARY_LIST = []
+PRIMARY_LIST.append(Item('Bacon', 5.79))
+PRIMARY_LIST.append(Item('Pet Food', 4.63)) #made up pric
+PRIMARY_LIST = np.array(PRIMARY_LIST)
+b = ([0.1, 0.1,0.4,0.1,0.2, 0.1])
+createCustomer(PRIMARY_LIST, SECONDARY_LIST, b, b)
+    """
     for i in range(NUMBER_PRIMARY_LIST):
-        val = np.random.randint(0, len(prim))
-        custPrimList.append(prim[val])
+        val = np.random.uniform(0,1)
+        newIndex = createCustomerHelper(val, percPrim, custPrimList, prim)
+        #print(prim)
+        #-1 to index helps
+        custPrimList.append(prim[newIndex-1])
     
     for i in range(NUMBER_SECONDARY_LIST):
-        val = np.random.randint(0, len(sec))
-        custSecList.append(sec[val])
-        
-    """
-    lowerBoundRange = 0
-    val = np.random.uniform()
-    for i in len(percPrim):
-        if val <= percPrim[i] and val > lowerBoundRange:
-    """       
-        
-    #NEED WORK
-       
+        val = np.random.uniform(0,1)
+        newIndex = createCustomerHelper(val, percSec, custSecList, sec)
+        custSecList.append(sec[newIndex-1]) 
+    
     return Customer(SPAWNER[0], SPAWNER[1], custPrimList, custSecList)
+
+def createCustomerHelper(value, probs, custList, itemList):
+    """
+    takes a value (between 0 and 1) and a probability array that adds up to 1
+    and 
+    """
+    index = 0
+    rangeLowerBound = 0
+    rangeUpperBound = 0
+    value *= 100
+    probs = np.array(probs) * 100
+    #print (probs)
+    
+    
+    for i in range(len(probs)):
+        #print (rangeLowerBound)
+        rangeUpperBound = rangeLowerBound + probs[i]
+        #print (probs[i])
+        if value > rangeLowerBound and value <= rangeUpperBound:
+            index = i
+            break
+        else:
+            rangeLowerBound += probs[i]
+            
+    if not custList:
+        return index
+    elif itemList[index] in custList:
+        val = np.random.uniform(0,1)
+        return createCustomerHelper(val, probs,custList, itemList)
+    else:
+        return index
 
 def createCustomerList(custAmount, percPrim = [], percSec = []):
     """
@@ -584,12 +616,12 @@ def createCustomerList(custAmount, percPrim = [], percSec = []):
     """
     custList = []
     for i in range(custAmount):
-        custList.append(createCustomer(PRIMARY_LIST, SECONDARY_LIST, 
-                                           percPrim = [], percSec = []))
+        custList.append(createCustomer(PRIMARY_LIST, SECONDARY_LIST,
+                                       percPrim, percSec))
         
     return custList
 
-def plot(data1, data2, data3):
+def runAnimatedSimulation(data1, data2, data3):
     """plot Method
 
     Method Arguments:
@@ -606,10 +638,13 @@ def plot(data1, data2, data3):
 
     """
     
-    #store = np.zeros(shape=(STORE_SIZE,STORE_SIZE))
+    store = np.zeros(shape=(STORE_SIZE,STORE_SIZE))
+    for i in range(len(shelfPositions)):
+        cords = shelfPositions[i]
+        store[cords[0], cords[1]] = 1
+                    
     
-    
-    plt.imshow(data1, cmap='Blues', interpolation='nearest')
+    plt.imshow(store, cmap='Blues', interpolation='nearest')
     plt.imshow(data2, cmap='summer', interpolation='nearest')
     plt.imshow(data3, cmap='autumn', interpolation='nearest')
     plt.show()
