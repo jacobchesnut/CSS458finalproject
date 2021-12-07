@@ -652,3 +652,85 @@ class Shelf(object):
         self.loc_in_env = np.array([x_init, y_init])
         self.stock = stockedItem
 
+#TestingSuite
+
+def TestAllNonSim():
+    """
+    TestAllNonSim
+    this function will test all code which is not a simulation running function
+    this is performed by calling all relevant test functions individually
+    """
+
+def TestMoveCustomer():
+    """
+    TestMoveCustomer
+    this function will test the MoveCustomer function. this is done by
+    generating a set of shelves, and testing the customer movement in
+    different situations.
+    
+    the following situations are tested:
+    -the customer is aligned with an item, and should move towards it
+    -the customer is not aligned and should move towards the edge of the store
+    """
+    customer = createCustomer(PRIMARY_LIST, SECONDARY_LIST)
+    customer.primary_list = np.array([PRIMARY_LIST[0]])
+    customer.loc_in_env = np.array([0,1])
+    shelves = np.array([Shelf(PRIMARY_LIST[0], 2, 0)])
+    global CUSTOMER_STEPS
+    CUSTOMER_STEPS = 0
+    MoveCustomer(customer, shelves, np.array([customer]))
+    if(not customer.loc_in_env[1] == 1):
+        print("TestMoveCustomer Test #1 failed:")
+        print("customer y position is " + str(customer.loc_in_env[1]) + "expected 1")
+    if(not customer.loc_in_env[0] == 1):
+        print("TestMoveCustomer Test #2 failed:")
+        print("customer x position is " + str(customer.loc_in_env[0]) + "expected 1")
+    if(not CUSTOMER_STEPS == 1):
+        print("TestMoveCustomer Test #3 failed:")
+        print("customer steps is at " + str(CUSTOMER_STEPS) + "expected 1")
+
+def TestCustomerPurchase():
+    """
+    TestCustomerPurchase
+    this function will test the CustomerPurchase function. this is done by
+    generating a set of shelves, and testing the customer purchasing from
+    nearby shelves
+    
+    the following situations are tested:
+    -the customer is near a shelf with an item they want, and they purchase it
+    """
+    customer = createCustomer(PRIMARY_LIST, SECONDARY_LIST)
+    customer.primary_list = np.array([PRIMARY_LIST[0]])
+    customer.loc_in_env = np.array([0,1])
+    shelves = np.array([Shelf(PRIMARY_LIST[0], 1, 0)])
+    global ITEMS_SOLD
+    global MONEY_MADE
+    ITEMS_SOLD = 0
+    MONEY_MADE = 0.0
+    CustomerPurchase(customer, shelves)
+    if(not len(customer.primary_list) == 0):
+        print("TestCustomerPurchase Test #1 failed:")
+        print("customer primary list is not empty, currently " + str(customer.primary_list))
+    if(not ITEMS_SOLD == 1):
+        print("TestCustomerPurchase Test #2 failed:")
+        print("items sold is at " + str(ITEMS_SOLD) + "expected 1")
+    if(not MONEY_MADE == PRIMARY_LIST[0].price):
+        print("TestCustomerPurchase Test #2 failed:")
+        print("money made is at " + str(MONEY_MADE) + "expected " + str(PRIMARY_LIST[0].price))
+
+def TestRemoveCustomers():
+    """
+    TestRemoveCustomers
+    this function will test the RemoveCustomers function. this is done by
+    generating a set of customers, and testing the customer removal for
+    customers without primary items
+    
+    the following situations are tested:
+    -one customer is left and has no more primary items
+    """
+    customer = createCustomer(PRIMARY_LIST, SECONDARY_LIST)
+    customer.primary_list = np.array([])
+    output = RemoveCustomers(np.array([customer]))
+    if(not len(output) == 0):
+        print("TestRemoveCustomers Test #1 failed:")
+        print("customer list is not empty, currently " + str(output))
