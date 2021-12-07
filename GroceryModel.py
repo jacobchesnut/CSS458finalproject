@@ -46,6 +46,13 @@ ITEMS_SOLD = 0
 #float representing the amount of money made in the current simulation
 MONEY_MADE = 0.0
 
+#User-modifiable constants
+#2D array which holds the positions of all shelves in the store, 33 in total
+shelfPositions = np.array([[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8], \
+                           [2,1],[2,2],[2,3],[2,4],[2,5],[2,6],[2,7],[2,8], \
+                           [3,1],[3,2],[3,3],[3,4],[3,5],[3,6],[3,7],[3,8], \
+                           [4,1],[4,2],[4,3],[4,4],[4,5],[4,6],[4,7],[4,8], \
+                           [5,1]])
 #Methods
 
 def MoveCustomer(customerToMove, storeShelves, allCustomers):
@@ -81,6 +88,7 @@ def MoveCustomer(customerToMove, storeShelves, allCustomers):
     (parallel to X-axis) shelves, and that none of the shelves create corners
     with each other.
     """
+    global CUSTOMER_STEPS
     customerCoords = customerToMove.loc_in_env
     #determine blocked directions
     blockedDirections = np.zeros(4, dtype=bool) #0123 = NESW
@@ -147,11 +155,13 @@ def MoveCustomer(customerToMove, storeShelves, allCustomers):
         #move north
         customerCoords[0] = customerCoords[0] - 1
         customerToMove.loc_in_env = customerCoords
+        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     if(shelfVector[0] < -1 and not blockedDirections[2]):
         #move south
         customerCoords[0] = customerCoords[0] + 1
         customerToMove.loc_in_env = customerCoords
+        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     
     #attempt to move horizontally
@@ -159,11 +169,13 @@ def MoveCustomer(customerToMove, storeShelves, allCustomers):
         #move west
         customerCoords[1] = customerCoords[1] - 1
         customerToMove.loc_in_env = customerCoords
+        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     if(shelfVector[1] < -1 and not blockedDirections[1]):
         #move east
         customerCoords[1] = customerCoords[1] + 1
         customerToMove.loc_in_env = customerCoords
+        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     
     #otherwise move randomly
@@ -172,21 +184,25 @@ def MoveCustomer(customerToMove, storeShelves, allCustomers):
         #move north
         customerCoords[0] = customerCoords[0] - 1
         customerToMove.loc_in_env = customerCoords
+        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     if(randomDirection == 1):
         #move east
         customerCoords[1] = customerCoords[1] + 1
         customerToMove.loc_in_env = customerCoords
+        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     if(randomDirection == 2):
         #move south
         customerCoords[0] = customerCoords[0] + 1
         customerToMove.loc_in_env = customerCoords
+        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
     if(randomDirection == 3):
         #move west
         customerCoords[1] = customerCoords[1] - 1
         customerToMove.loc_in_env = customerCoords
+        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
         return
 
 def GetRandDirection(blockedDirections):
@@ -264,10 +280,10 @@ def RemoveCustomers(allCustomers):
     items to search for
     """
     returnArray = allCustomers
-    for i in range(allCustomers):
+    for i in allCustomers:
         newList = []
-        if(i.primary_list.size == 0):
-            for j in range(allCustomers):
+        if(len(i.primary_list) == 0):
+            for j in allCustomers:
                 if(not i == j):
                     newList.append(j)
             returnArray = np.array(newList)
@@ -305,13 +321,13 @@ def RunOneSimulation(shelves):
                 customerCounter = customerCounter + 1
             else:
                 newList = []
-                for i in range(activeCustomerList):
+                for i in activeCustomerList:
                     newList.append(i)
                 newList.append(customerList[customerCounter])
                 customerCounter = customerCounter + 1
                 activeCustomerList = np.array(newList)
         #loop through all customers
-        for i in range(activeCustomerList):
+        for i in activeCustomerList:
             MoveCustomer(i, shelves, activeCustomerList)
             CustomerPurchase(i, shelves)
         RemoveCustomers(activeCustomerList)
@@ -346,10 +362,12 @@ def RunRandomizedSimulations():
     """
     for i in range(5):
         #create shelves for the store here
-        shelves = initshelves
+        shelves = createStore(shelfPositions)
         averages = RunOneHundredSimulations(shelves)
         print("For simulation " + str(i) + ":")
-        #print out shelf contents information here
+        print("the shelf layout was...")
+        for i in shelves:
+            print(i.stock.name)
         print("The average items sold was " + str(averages[0]) + ".")
         print("The average money earned was " + str(averages[1]) + ".")
         print("The average distance walked was " + str(averages[2]) + ".")
@@ -363,6 +381,8 @@ def initItems():
     created from this.
     """
     #2017 prices for common grocery items. source https://www.visualcapitalist.com/decade-grocery-prices/
+    global PRIMARY_LIST
+    PRIMARY_LIST = []
     PRIMARY_LIST.append(Item('Bacon', 5.79)) 
     PRIMARY_LIST.append(Item('Pasta', 1.28)) 
     PRIMARY_LIST.append(Item('Beans', 1.36))         
@@ -376,8 +396,11 @@ def initItems():
     PRIMARY_LIST.append(Item('Eggs', 1.6)) #made up price
     PRIMARY_LIST.append(Item('Water', 1.1)) #made up price
     PRIMARY_LIST.append(Item('Pet Food', 4.63)) #made up price
+    PRIMARY_LIST = np.array(PRIMARY_LIST)
      
     #Secondary items. Makeing stuff up rn
+    global SECONDARY_LIST
+    SECONDARY_LIST = []
     SECONDARY_LIST.append(Item('Chips', 2.50))
     SECONDARY_LIST.append(Item('Soda', 1.22))
     SECONDARY_LIST.append(Item('Gum', 0.76))
@@ -398,23 +421,31 @@ def initItems():
     SECONDARY_LIST.append(Item('Juice', 4.90))
     SECONDARY_LIST.append(Item('Brownies', 1.94))
     SECONDARY_LIST.append(Item('Pizza', 6.66))  
+    SECONDARY_LIST = np.array(SECONDARY_LIST)
         
 def createStore(loc = []):
     """
     takes a 2D numpy array of coordinates (a[0,:] = x coords. 
     A[1,:] = y coords), and returns a numpy array of shelves created in
     each coordinate, with a random item per shelf.
+    
+    this function assumes that there are exactly as many items as shelves in
+    the store
     """
     shelves = []
     
     #all items into a single list
-    allItems = np.concatenate(PRIMARY_LIST, SECONDARY_LIST)
+    allItems = np.concatenate((PRIMARY_LIST, SECONDARY_LIST))
     
     #randomly assign an item to each shelf and remove the item from the list
-    for i in len(loc):
-        val = np.random.randInt(0, len(loc))
+    for i in range(len(allItems)):
+        val = np.random.randint(0, len(allItems))
         shelves.append(Shelf(allItems[val], loc[i][0], loc[i][1]))
-        allItems[val].remove
+        newList = []
+        for j in allItems:
+            if(not j == allItems[val]):
+                newList.append(j)
+        allItems = np.array(newList)
         
     return shelves
             
@@ -429,18 +460,19 @@ def createCustomer(prim = [], sec = [], percPrim = [], percSec = []):
     random selection (with the probability density if provided) up to the
     number specified in the constants. 
     """
-    custPrimList = np.zeros(len(NUMBER_PRIMARY_LIST))
-    custSecList = np.zeros(len(NUMBER_SECONDARY_LIST))
+    custPrimList = []
+    custSecList = []
     
     #random generation with no percent distribution
+    #currently can generate duplicates
     
-    for i in range(len(custPrimList)):
-        val = np.random.randInt(0, len(prim))
-        custPrimList[i] = prim[val]
+    for i in range(NUMBER_PRIMARY_LIST):
+        val = np.random.randint(0, len(prim))
+        custPrimList.append(prim[val])
     
-    for i in range(len(custSecList)):
-        val = np.random.randInt(0, len(prim))
-        custPrimList[i] = sec[val]
+    for i in range(NUMBER_SECONDARY_LIST):
+        val = np.random.randint(0, len(sec))
+        custSecList.append(sec[val])
         
     """
     lowerBoundRange = 0
