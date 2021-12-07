@@ -612,12 +612,58 @@ def createCustomerList(custAmount, percPrim = [], percSec = []):
         
     return custList
 
+def RunOneAnimatedSimulation(shelves):
+    """
+    RunOneAnimatedSimulation
+    takes a numpy array of shelves representing a store, and runs a single
+    simulation by creating a list of shoppers (without a probability density),
+    looping through moving the customers and purchasing items, with customers
+    being placed into the store every set amount of steps.
+    
+    the simulation will be animated
+    The results are kept in the global result variables.
+    """
+    #initialize items possibly
+    customerList = createCustomerList(TOTAL_CUSTOMERS, None, None)
+    activeCustomerList = None
+    customerCounter = 0 #current customer to pull from customer list
+    counter = 0 #step number in store
+    global CUSTOMER_STEPS
+    global ITEMS_SOLD
+    global MONEY_MADE
+    CUSTOMER_STEPS = 0
+    ITEMS_SOLD = 0
+    MONEY_MADE = 0.0
+    #main simulation loop
+    while(counter < MAX_TIME):
+        #time to add a new customer
+        if((counter % DELTA_CUSTOMER) == 0 and customerCounter < TOTAL_CUSTOMERS - 1):
+            if(activeCustomerList is None):
+                activeCustomerList = np.array([customerList[customerCounter]])
+                customerCounter = customerCounter + 1
+            else:
+                newList = []
+                for i in activeCustomerList:
+                    newList.append(i)
+                newList.append(customerList[customerCounter])
+                customerCounter = customerCounter + 1
+                activeCustomerList = np.array(newList)
+        #loop through all customers
+        for i in activeCustomerList:
+            MoveCustomer(i, shelves, activeCustomerList)
+            CustomerPurchase(i, shelves)
+        activeCustomerList = RemoveCustomers(activeCustomerList)
+        runAnimatedSimulation(activeCustomerList, None)
+        #check if it's time to exit the sim
+        if(len(activeCustomerList) <= 0 and customerCounter >= TOTAL_CUSTOMERS - 1):
+            return
+        counter = counter + 1
+
 def runAnimatedSimulation(data1, data3):
     """plot Method
 
     Method Arguments:
-    * data1 = shelves
-    * data2 = customers
+    * data1 = customers
     * data3 = undefined overlay
     
     Function:
