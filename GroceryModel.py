@@ -552,26 +552,17 @@ def createCustomer(prim = [], sec = [], percPrim = [], percSec = []):
     custSecList = []
     #random generation with no percent distribution
     #currently can generate duplicates
-    """
-PRIMARY_LIST = []
-PRIMARY_LIST.append(Item('Bacon', 5.79))
-PRIMARY_LIST.append(Item('Pet Food', 4.63)) #made up pric
-PRIMARY_LIST = np.array(PRIMARY_LIST)
-b = ([0.1, 0.1,0.4,0.1,0.2, 0.1])
-createCustomer(PRIMARY_LIST, SECONDARY_LIST, b, b)
-    """
+    #createCustomer(PRIMARY_LIST, SECONDARY_LIST, primaryDensity, secondaryDensity)
     for i in range(NUMBER_PRIMARY_LIST):
         val = np.random.uniform(0,1)
         newIndex = createCustomerHelper(val, percPrim, custPrimList, prim)
-        #print(prim)
-        #-1 to index helps
-        custPrimList.append(prim[newIndex-1])
-    
+        custPrimList.append(prim[newIndex])
+
     for i in range(NUMBER_SECONDARY_LIST):
         val = np.random.uniform(0,1)
         newIndex = createCustomerHelper(val, percSec, custSecList, sec)
-        custSecList.append(sec[newIndex-1]) 
-    
+        custSecList.append(sec[newIndex]) 
+ 
     return Customer(SPAWNER[0], SPAWNER[1], custPrimList, custSecList)
 
 def createCustomerHelper(value, probs, custList, itemList):
