@@ -553,6 +553,9 @@ def createCustomer(prim = [], sec = [], percPrim = [], percSec = []):
     #random generation with no percent distribution
     #currently can generate duplicates
     #createCustomer(PRIMARY_LIST, SECONDARY_LIST, primaryDensity, secondaryDensity)
+    
+
+    
     for i in range(NUMBER_PRIMARY_LIST):
         val = np.random.uniform(0,1)
         newIndex = createCustomerHelper(val, percPrim, custPrimList, prim)
@@ -571,6 +574,16 @@ def createCustomerHelper(value, probs, custList, itemList):
     and 
     """
     index = 0
+    if probs == None:
+        index = np.random.randint(0, len(itemList))
+        if not custList:
+            return index
+        elif itemList[index] in custList:
+             return createCustomerHelper(value, probs,custList, itemList)
+        else:
+             return index
+
+    
     rangeLowerBound = 0
     rangeUpperBound = 0
     value *= 100
@@ -582,6 +595,7 @@ def createCustomerHelper(value, probs, custList, itemList):
         #print (rangeLowerBound)
         rangeUpperBound = rangeLowerBound + probs[i]
         #print (probs[i])
+        #print(rangeUpperBound, rangeLowerBound, value)
         if value > rangeLowerBound and value <= rangeUpperBound:
             index = i
             break
