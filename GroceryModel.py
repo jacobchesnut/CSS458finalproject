@@ -53,6 +53,15 @@ shelfPositions = np.array([[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8], \
                            [3,1],[3,2],[3,3],[3,4],[3,5],[3,6],[3,7],[3,8], \
                            [4,1],[4,2],[4,3],[4,4],[4,5],[4,6],[4,7],[4,8], \
                            [5,1]])
+#array which holds the percentages for primary items when using item density
+#arbitrarily decided on
+primaryDensity = np.array([0.02, 0.1, 0.05, 0.03, 0.1, 0.05, 0.05, 0.1,     \
+                           0.07, 0.2, 0.15, 0.03, 0.05])
+#array which holds the percentages for secondary items when using item density
+#arbitrarily decided on
+secondaryDensity = np.array([0.1, 0.05, 0.03, 0.05, 0.03, 0.05, 0.02, 0.1, \
+                             0.05, 0.05, 0.02, 0.1, 0.05, 0.05, 0.04, 0.03,\
+                             0.01, 0.02, 0.05, 0.1])
 #Methods
 
 def MoveCustomer(customerToMove, storeShelves, allCustomers):
@@ -381,6 +390,75 @@ def RunRandomizedSimulations():
         print("The average items sold was " + str(averages[0]) + ".")
         print("The average money earned was " + str(averages[1]) + ".")
         print("The average distance walked was " + str(averages[2]) + ".")
+
+def RunOneSimulationDensity(shelves):
+    """
+    RunOneSimulationDensity
+    takes a numpy array of shelves representing a store, and runs a single
+    simulation by creating a list of shoppers (with a probability density),
+    looping through moving the customers and purchasing items, with customers
+    being placed into the store every set amount of steps.
+    
+    shelves should be a numpy array of shelves representing the store to
+    simulate.
+    The results are kept in the global result variables.
+    """
+    #initialize items possibly
+    customerList = createCustomerList(TOTAL_CUSTOMERS, primaryDensity, secondaryDensity)
+    activeCustomerList = None
+    customerCounter = 0 #current customer to pull from customer list
+    counter = 0 #step number in store
+    global CUSTOMER_STEPS
+    global ITEMS_SOLD
+    global MONEY_MADE
+    CUSTOMER_STEPS = 0
+    ITEMS_SOLD = 0
+    MONEY_MADE = 0.0
+    #main simulation loop
+    while(counter < MAX_TIME):
+        #time to add a new customer
+        if((counter % DELTA_CUSTOMER) == 0 and customerCounter < TOTAL_CUSTOMERS - 1):
+            if(activeCustomerList is None):
+                activeCustomerList = np.array([customerList[customerCounter]])
+                customerCounter = customerCounter + 1
+            else:
+                newList = []
+                for i in activeCustomerList:
+                    newList.append(i)
+                newList.append(customerList[customerCounter])
+                customerCounter = customerCounter + 1
+                activeCustomerList = np.array(newList)
+        #loop through all customers
+        for i in activeCustomerList:
+            MoveCustomer(i, shelves, activeCustomerList)
+            CustomerPurchase(i, shelves)
+        activeCustomerList = RemoveCustomers(activeCustomerList)
+        #check if it's time to exit the sim
+        if(len(activeCustomerList) <= 0 and customerCounter >= TOTAL_CUSTOMERS - 1):
+            return
+        counter = counter + 1
+
+def RunOneHundredDensitySimulations(shelves):
+    """
+    RunOneHundredSimulations
+    takes a numpy array of shelves representing a store and runs one hundred
+    single simulations, averaging and returning the results as floats in a
+    numpy array where a[0] = average items sold, a[1] = average money earned,
+    and a[2] = average distance walked.
+    """
+    averageItemsSold = 0
+    averageMoneyEarned = 0.0
+    averageDistanceWalked = 0
+    for i in range(10):
+        print("running simulation #" + str(i))
+        RunOneSimulationDensity(shelves)
+        averageItemsSold = averageItemsSold + ITEMS_SOLD
+        averageMoneyEarned = averageMoneyEarned + MONEY_MADE
+        averageDistanceWalked = averageDistanceWalked + CUSTOMER_STEPS
+    averageItemsSold = averageItemsSold/10
+    averageMoneyEarned = averageMoneyEarned/10
+    averageDistanceWalked = averageDistanceWalked/10
+    return np.array([averageItemsSold, averageMoneyEarned, averageDistanceWalked])
         
     
  
