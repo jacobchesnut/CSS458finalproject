@@ -148,6 +148,11 @@ def MoveCustomer(customerToMove, storeShelves, allCustomers):
             if(oldC > newC):
                 closestShelf = i
                 closestDistance = shelfDist
+    #avoid movement of customers finished shopping
+    if(closestShelf is None):
+        #print("closestShelf is none!")
+        #print(customerToMove.primary_list)
+        return
     
     #attempt to move vertically
     shelfVector = customerCoords - closestShelf.loc_in_env
@@ -264,7 +269,7 @@ def CustomerPurchase(customerToPurchase, storeShelves):
                         #add into the list if not being removed
                         if(not j == k):
                             newList.append(k)
-                    customerToPurchase.primary_list = np.array(newList)
+                    customerToPurchase.secondary_list = np.array(newList)
                     #increment counters
                     ITEMS_SOLD = ITEMS_SOLD + 1
                     MONEY_MADE = MONEY_MADE + j.price
@@ -330,7 +335,11 @@ def RunOneSimulation(shelves):
         for i in activeCustomerList:
             MoveCustomer(i, shelves, activeCustomerList)
             CustomerPurchase(i, shelves)
-        RemoveCustomers(activeCustomerList)
+        activeCustomerList = RemoveCustomers(activeCustomerList)
+        #check if it's time to exit the sim
+        if(len(activeCustomerList) <= 0 and customerCounter >= TOTAL_CUSTOMERS - 1):
+            return
+        counter = counter + 1
 
 def RunOneHundredSimulations(shelves):
     """
@@ -343,14 +352,15 @@ def RunOneHundredSimulations(shelves):
     averageItemsSold = 0
     averageMoneyEarned = 0.0
     averageDistanceWalked = 0
-    for i in range(100):
+    for i in range(10):
+        print("running simulation #" + str(i))
         RunOneSimulation(shelves)
         averageItemsSold = averageItemsSold + ITEMS_SOLD
         averageMoneyEarned = averageMoneyEarned + MONEY_MADE
         averageDistanceWalked = averageDistanceWalked + CUSTOMER_STEPS
-    averageItemsSold = averageItemsSold/100
-    averageMoneyEarned = averageMoneyEarned/100
-    averageDistanceWalked = averageDistanceWalked/100
+    averageItemsSold = averageItemsSold/10
+    averageMoneyEarned = averageMoneyEarned/10
+    averageDistanceWalked = averageDistanceWalked/10
     return np.array([averageItemsSold, averageMoneyEarned, averageDistanceWalked])
 
 def RunRandomizedSimulations():
