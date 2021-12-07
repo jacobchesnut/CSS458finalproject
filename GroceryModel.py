@@ -50,9 +50,9 @@ MONEY_MADE = 0.0
 #2D array which holds the positions of all shelves in the store, 33 in total
 shelfPositions = np.array([[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8], \
                            [2,1],[2,2],[2,3],[2,4],[2,5],[2,6],[2,7],[2,8], \
-                           [3,1],[3,2],[3,3],[3,4],[3,5],[3,6],[3,7],[3,8], \
                            [4,1],[4,2],[4,3],[4,4],[4,5],[4,6],[4,7],[4,8], \
-                           [5,1]])
+                           [6,1],[6,2],[6,3],[6,4],[6,5],[6,6],[6,7],[6,8], \
+                           [8,1]])
 #array which holds the percentages for primary items when using item density
 #arbitrarily decided on
 primaryDensity = np.array([0.02, 0.1, 0.05, 0.03, 0.1, 0.05, 0.05, 0.1,     \
@@ -654,12 +654,38 @@ class Shelf(object):
 
 #TestingSuite
 
+def TestAll():
+    """
+    TestAll
+    this function will test all code currently testable
+    this is performed by calling all relevant test functions individually
+    """
+    TestAllNonSim()
+    TestAllSims()
+
 def TestAllNonSim():
     """
     TestAllNonSim
     this function will test all code which is not a simulation running function
     this is performed by calling all relevant test functions individually
     """
+    TestMoveCustomer()
+    TestCustomerPurchase()
+    TestRemoveCustomers()
+    TestCreateStore()
+    TestCreateCustomer()
+    TestCreateCustomerList()
+
+def TestAllSims():
+    """
+    TestAllSims
+    this function will test all code which is a simulation running function
+    this is preformed by calling all relevant test functions individually
+    """
+    TestOneSimulation()
+    TestOneHundredSimulations()
+    TestOneDensitySimulation()
+    TestOneHundredDensitySimulations()
 
 def TestMoveCustomer():
     """
@@ -681,13 +707,13 @@ def TestMoveCustomer():
     MoveCustomer(customer, shelves, np.array([customer]))
     if(not customer.loc_in_env[1] == 1):
         print("TestMoveCustomer Test #1 failed:")
-        print("customer y position is " + str(customer.loc_in_env[1]) + "expected 1")
+        print("customer y position is " + str(customer.loc_in_env[1]) + " expected 1")
     if(not customer.loc_in_env[0] == 1):
         print("TestMoveCustomer Test #2 failed:")
-        print("customer x position is " + str(customer.loc_in_env[0]) + "expected 1")
+        print("customer x position is " + str(customer.loc_in_env[0]) + " expected 1")
     if(not CUSTOMER_STEPS == 1):
         print("TestMoveCustomer Test #3 failed:")
-        print("customer steps is at " + str(CUSTOMER_STEPS) + "expected 1")
+        print("customer steps is at " + str(CUSTOMER_STEPS) + " expected 1")
 
 def TestCustomerPurchase():
     """
@@ -713,10 +739,10 @@ def TestCustomerPurchase():
         print("customer primary list is not empty, currently " + str(customer.primary_list))
     if(not ITEMS_SOLD == 1):
         print("TestCustomerPurchase Test #2 failed:")
-        print("items sold is at " + str(ITEMS_SOLD) + "expected 1")
+        print("items sold is at " + str(ITEMS_SOLD) + " expected 1")
     if(not MONEY_MADE == PRIMARY_LIST[0].price):
         print("TestCustomerPurchase Test #2 failed:")
-        print("money made is at " + str(MONEY_MADE) + "expected " + str(PRIMARY_LIST[0].price))
+        print("money made is at " + str(MONEY_MADE) + " expected " + str(PRIMARY_LIST[0].price))
 
 def TestRemoveCustomers():
     """
@@ -734,3 +760,120 @@ def TestRemoveCustomers():
     if(not len(output) == 0):
         print("TestRemoveCustomers Test #1 failed:")
         print("customer list is not empty, currently " + str(output))
+
+def TestOneSimulation():
+    """
+    TestOneSimulation
+    this function will test the RunOneSimulation function. It will compare
+    The outputs of the function to ensure they make sense
+    
+    the following situations are tested:
+    -one simulation is run
+    """
+    RunOneSimulation(createStore(shelfPositions))
+    if(not ITEMS_SOLD <= 300):
+        print("TestOneSimulation Test #1 failed:")
+        print("items sold is " + str(ITEMS_SOLD) + " expected less than 300")
+    if(not CUSTOMER_STEPS <= 15000):
+        print("TestOneSimulation Test #2 failed:")
+        print("customer steps is " + str(CUSTOMER_STEPS) + " expected less than 15000")
+
+def TestOneDensitySimulation():
+    """
+    TestOneDensitySimulation
+    this function will test the RunOneDensity Simulation function. It will
+    compare the outputs of the function to ensure they make sense
+    
+    the following situations are tested:
+    -one simulation is run with density
+    """
+    RunOneSimulationDensity(createStore(shelfPositions))
+    if(not ITEMS_SOLD <= 300):
+        print("TestOneDensitySimulation Test #1 failed:")
+        print("items sold is " + str(ITEMS_SOLD) + " expected less than 300")
+    if(not CUSTOMER_STEPS <= 15000):
+        print("TestOneDensitySimulation Test #2 failed:")
+        print("customer steps is " + str(CUSTOMER_STEPS) + " expected less than 15000")
+
+def TestOneHundredSimulations():
+    """
+    TestOneHundredSimulations
+    this function will test the RunOneHundredSimulations function. It will compare
+    The outputs of the function to ensure they make sense
+    
+    the following situations are tested:
+    -one hundred simulations are run
+    """
+    output = RunOneHundredSimulations(createStore(shelfPositions))
+    if(not output[0] <= 300):
+        print("TestOneSimulation Test #1 failed:")
+        print("average items sold is " + str(output[0]) + " expected less than 300")
+    if(not output[2] <= 15000):
+        print("TestOneSimulation Test #2 failed:")
+        print("average customer steps is " + str(output[2]) + " expected less than 15000")
+
+def TestOneHundredDensitySimulations():
+    """
+    TestOneHundredDensitySimulations
+    this function will test the RunOneHundredDensitySimulations function. It will compare
+    The outputs of the function to ensure they make sense
+    
+    the following situations are tested:
+    -one hundred simulations are run with density
+    """
+    output = RunOneHundredDensitySimulations(createStore(shelfPositions))
+    if(not output[0] <= 300):
+        print("TestOneSimulation Test #1 failed:")
+        print("average items sold is " + str(output[0]) + " expected less than 300")
+    if(not output[2] <= 15000):
+        print("TestOneSimulation Test #2 failed:")
+        print("average customer steps is " + str(output[2]) + " expected less than 15000")
+
+def TestCreateStore():
+    """
+    TestCreateStore
+    this function will test the TestCreateStore function. it will compare the
+    created shelf list to what is expected.
+    
+    the following situations are tested:
+    -creating the store with the default layout
+    """
+    output = createStore(shelfPositions)
+    for i in output:
+        if(i.loc_in_env[0] == 0 and i.loc_in_env[1] == 0):
+            print("TestCreateStore Test #1:")
+            print("shelf found in 0,0 the store may not have been created correctly")
+
+def TestCreateCustomer():
+    """
+    TestCreateCustomer
+    this function will test the createCustomer function. it will compare the
+    created customer to what is expected.
+    
+    the following situations are tested:
+    -a single customer is created without density
+    """
+    customer = createCustomer(PRIMARY_LIST, SECONDARY_LIST)
+    if(not len(customer.primary_list) == NUMBER_PRIMARY_LIST):
+        print("TestCreateCustomer Test #1 failed:")
+        print("customer primary list is " + str(customer.primary_list) + \
+              " expected " + str(NUMBER_PRIMARY_LIST) + " items")
+    if(not len(customer.secondary_list) == NUMBER_SECONDARY_LIST):
+        print("TestCreateCustomer Test #2 failed:")
+        print("customer secondary list is " + str(customer.secondary_list) + \
+              " expected " + str(NUMBER_SECONDARY_LIST) + " items")
+
+def TestCreateCustomerList():
+    """
+    TestCreateCustomerList
+    this function will test the createCustomerList function. it will compare the
+    created customer to what is expected.
+    
+    the following situations are tested:
+    -a single customer list is created without density
+    """
+    customerList = createCustomerList(TOTAL_CUSTOMERS)
+    if(not len(customerList) == TOTAL_CUSTOMERS):
+        print("TestCreateCustomerList Test #1 failed:")
+        print("customer list is " + str(customerList) + \
+              " expected " + str(TOTAL_CUSTOMERS) + " customers")
