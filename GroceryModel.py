@@ -537,7 +537,7 @@ def createStore(loc = []):
         
     return shelves
             
-def createCustomer(prim = [], sec = [], percPrim = [], percSec = []):
+def createCustomer(prim = [], sec = [], percPrim = None, percSec = None):
     """
     takes a numpy array of primary items, a numpy array of secondary items,
     a numpy array of floats representing percentages in an item density 
@@ -574,7 +574,7 @@ def createCustomerHelper(value, probs, custList, itemList):
     and 
     """
     index = 0
-    if probs == None:
+    if probs is None:
         index = np.random.randint(0, len(itemList))
         if not custList:
             return index
@@ -586,8 +586,7 @@ def createCustomerHelper(value, probs, custList, itemList):
     
     rangeLowerBound = 0
     rangeUpperBound = 0
-    value *= 100
-    probs = np.array(probs) * 100
+    probs = probs
     #print (probs)
     
     
@@ -596,7 +595,7 @@ def createCustomerHelper(value, probs, custList, itemList):
         rangeUpperBound = rangeLowerBound + probs[i]
         #print (probs[i])
         #print(rangeUpperBound, rangeLowerBound, value)
-        if value > rangeLowerBound and value <= rangeUpperBound:
+        if value <= rangeUpperBound:
             index = i
             break
         else:
@@ -610,7 +609,7 @@ def createCustomerHelper(value, probs, custList, itemList):
     else:
         return index
 
-def createCustomerList(custAmount, percPrim = [], percSec = []):
+def createCustomerList(custAmount, percPrim = None, percSec = None):
     """
     createCustomerList: takes an integer for the number of customers to 
     create, a numpy array of floats representing percentages in an item
@@ -705,6 +704,7 @@ def runAnimatedSimulation(data1, data3):
     plt.imshow(cMask, cmap='summer', interpolation='nearest')
     #plt.imshow(data3, cmap='autumn', interpolation='nearest')
     plt.show()
+    plt.pause(0.01)
 
 
 #Classes
@@ -945,7 +945,7 @@ def TestCreateCustomer():
     the following situations are tested:
     -a single customer is created without density
     """
-    customer = createCustomer(PRIMARY_LIST, SECONDARY_LIST)
+    customer = createCustomer(PRIMARY_LIST, SECONDARY_LIST, None, None)
     if(not len(customer.primary_list) == NUMBER_PRIMARY_LIST):
         print("TestCreateCustomer Test #1 failed:")
         print("customer primary list is " + str(customer.primary_list) + \
@@ -964,7 +964,7 @@ def TestCreateCustomerList():
     the following situations are tested:
     -a single customer list is created without density
     """
-    customerList = createCustomerList(TOTAL_CUSTOMERS)
+    customerList = createCustomerList(TOTAL_CUSTOMERS, None, None)
     if(not len(customerList) == TOTAL_CUSTOMERS):
         print("TestCreateCustomerList Test #1 failed:")
         print("customer list is " + str(customerList) + \
