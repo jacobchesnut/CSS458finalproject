@@ -848,6 +848,10 @@ def TestCustomerPurchase():
     
     the following situations are tested:
     -the customer is near a shelf with an item they want, and they purchase it
+    -the customer is near a shelf with a secondary item they want, and they
+     purchase it
+    -the customer is near a shelf without a primary or secondary item they
+     want, and they do not purchase it
     """
     customer = createCustomer(PRIMARY_LIST, SECONDARY_LIST)
     customer.primary_list = np.array([PRIMARY_LIST[0]])
@@ -865,8 +869,42 @@ def TestCustomerPurchase():
         print("TestCustomerPurchase Test #2 failed:")
         print("items sold is at " + str(ITEMS_SOLD) + " expected 1")
     if(not MONEY_MADE == PRIMARY_LIST[0].price):
-        print("TestCustomerPurchase Test #2 failed:")
+        print("TestCustomerPurchase Test #3 failed:")
         print("money made is at " + str(MONEY_MADE) + " expected " + str(PRIMARY_LIST[0].price))
+    
+    customer = createCustomer(PRIMARY_LIST, SECONDARY_LIST)
+    customer.secondary_list = np.array([SECONDARY_LIST[0]])
+    customer.loc_in_env = np.array([0,1])
+    shelves = np.array([Shelf(SECONDARY_LIST[0], 1, 0)])
+    ITEMS_SOLD = 0
+    MONEY_MADE = 0.0
+    CustomerPurchase(customer, shelves)
+    if(not len(customer.secondary_list) == 0):
+        print("TestCustomerPurchase Test #4 failed:")
+        print("customer primary list is not empty, currently " + str(customer.primary_list))
+    if(not ITEMS_SOLD == 1):
+        print("TestCustomerPurchase Test #5 failed:")
+        print("items sold is at " + str(ITEMS_SOLD) + " expected 1")
+    if(not MONEY_MADE == SECONDARY_LIST[0].price):
+        print("TestCustomerPurchase Test #6 failed:")
+        print("money made is at " + str(MONEY_MADE) + " expected " + str(PRIMARY_LIST[0].price))
+    
+    customer = createCustomer(PRIMARY_LIST, SECONDARY_LIST)
+    customer.primary_list = np.array([PRIMARY_LIST[0]])
+    customer.loc_in_env = np.array([0,1])
+    shelves = np.array([Shelf(PRIMARY_LIST[1], 1, 0)])
+    ITEMS_SOLD = 0
+    MONEY_MADE = 0.0
+    CustomerPurchase(customer, shelves)
+    if(not len(customer.primary_list) == 1):
+        print("TestCustomerPurchase Test #7 failed:")
+        print("customer primary list is currently " + str(customer.primary_list) + "expected one item")
+    if(not ITEMS_SOLD == 0):
+        print("TestCustomerPurchase Test #8 failed:")
+        print("items sold is at " + str(ITEMS_SOLD) + " expected 0")
+    if(not MONEY_MADE == 0.0):
+        print("TestCustomerPurchase Test #9 failed:")
+        print("money made is at " + str(MONEY_MADE) + " expected 0")
 
 def TestRemoveCustomers():
     """
@@ -877,6 +915,7 @@ def TestRemoveCustomers():
     
     the following situations are tested:
     -one customer is left and has no more primary items
+    -one customer exists but still has primary items
     """
     customer = createCustomer(PRIMARY_LIST, SECONDARY_LIST)
     customer.primary_list = np.array([])
@@ -884,6 +923,12 @@ def TestRemoveCustomers():
     if(not len(output) == 0):
         print("TestRemoveCustomers Test #1 failed:")
         print("customer list is not empty, currently " + str(output))
+    
+    customer = createCustomer(PRIMARY_LIST, SECONDARY_LIST)
+    output = RemoveCustomers(np.array([customer]))
+    if(not len(output) == 1):
+        print("TestRemoveCustomers Test #1 failed:")
+        print("customer list is not filled, currently " + str(output))
 
 def TestOneSimulation():
     """
