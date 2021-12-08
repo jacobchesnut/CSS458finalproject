@@ -497,9 +497,9 @@ def initItems():
     PRIMARY_LIST.append(Item('Rice', 0.72)) 
     PRIMARY_LIST.append(Item('Sugar', 0.65)) 
     PRIMARY_LIST.append(Item('Milk', 3.24)) 
-    PRIMARY_LIST.append(Item('Eggs', 1.6)) #made up price
-    PRIMARY_LIST.append(Item('Water', 1.1)) #made up price
-    PRIMARY_LIST.append(Item('Pet Food', 4.63)) #made up price
+    PRIMARY_LIST.append(Item('Eggs', 1.43))
+    PRIMARY_LIST.append(Item('Butter', 3.38))
+    PRIMARY_LIST.append(Item('Bread', 1.34))
     PRIMARY_LIST = np.array(PRIMARY_LIST)
      
     #Secondary items. Makeing stuff up rn
@@ -510,7 +510,7 @@ def initItems():
     SECONDARY_LIST.append(Item('Gum', 0.76))
     SECONDARY_LIST.append(Item('Chocolate', 1.02))
     SECONDARY_LIST.append(Item('Ice Cream', 4.70))
-    SECONDARY_LIST.append(Item('Fizzy Water', 2.50))
+    SECONDARY_LIST.append(Item('Water', 2.50))
     SECONDARY_LIST.append(Item('Carrot', 3.22))
     SECONDARY_LIST.append(Item('Cake', 10.45))
     SECONDARY_LIST.append(Item('Cookies', 5.78))
@@ -518,7 +518,7 @@ def initItems():
     SECONDARY_LIST.append(Item('Cooking Wine', 8.00))
     SECONDARY_LIST.append(Item('Doughnut', 1.41))
     SECONDARY_LIST.append(Item('Chicken Nuggets', 5.80))
-    SECONDARY_LIST.append(Item('Fries', 3.69))
+    SECONDARY_LIST.append(Item('Soy Sauce', 3.69))
     SECONDARY_LIST.append(Item('Cheese', 1.98))
     SECONDARY_LIST.append(Item('Rice Noodles', 5.78))
     SECONDARY_LIST.append(Item('Jelly', 3.12))
