@@ -179,18 +179,34 @@ def MoveCustomer(customerToMove, storeShelves, allCustomers):
         return
     
     #attempt to move horizontally
-    if(shelfVector[1] > 1 and not blockedDirections[3]):
-        #move west
-        customerCoords[1] = customerCoords[1] - 1
-        customerToMove.loc_in_env = customerCoords
-        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
-        return
-    if(shelfVector[1] < -1 and not blockedDirections[1]):
-        #move east
-        customerCoords[1] = customerCoords[1] + 1
-        customerToMove.loc_in_env = customerCoords
-        CUSTOMER_STEPS = CUSTOMER_STEPS + 1
-        return
+    #if we need to find a way out of this row
+    if(shelfVector[0] > 1 or shelfVector[0] < -1):
+        if(customerCoords[1] < STORE_SIZE/2 and not blockedDirections[3]):
+            #move west
+            customerCoords[1] = customerCoords[1] - 1
+            customerToMove.loc_in_env = customerCoords
+            CUSTOMER_STEPS = CUSTOMER_STEPS + 1
+            return
+        if(customerCoords[1] >= STORE_SIZE/2 and not blockedDirections[1]):
+            #move east
+            customerCoords[1] = customerCoords[1] + 1
+            customerToMove.loc_in_env = customerCoords
+            CUSTOMER_STEPS = CUSTOMER_STEPS + 1
+            return
+    #if we otherwise need to move towards the item
+    else:
+        if(shelfVector[1] > 1 and not blockedDirections[3]):
+            #move west
+            customerCoords[1] = customerCoords[1] - 1
+            customerToMove.loc_in_env = customerCoords
+            CUSTOMER_STEPS = CUSTOMER_STEPS + 1
+            return
+        if(shelfVector[1] < -1 and not blockedDirections[1]):
+            #move east
+            customerCoords[1] = customerCoords[1] + 1
+            customerToMove.loc_in_env = customerCoords
+            CUSTOMER_STEPS = CUSTOMER_STEPS + 1
+            return
     
     #otherwise move randomly
     randomDirection = GetRandDirection(blockedDirections)
@@ -361,15 +377,15 @@ def RunOneHundredSimulations(shelves):
     averageItemsSold = 0
     averageMoneyEarned = 0.0
     averageDistanceWalked = 0
-    for i in range(10):
-        print("running simulation #" + str(i))
+    for i in range(100):
+        #print("running simulation #" + str(i))
         RunOneSimulation(shelves)
         averageItemsSold = averageItemsSold + ITEMS_SOLD
         averageMoneyEarned = averageMoneyEarned + MONEY_MADE
         averageDistanceWalked = averageDistanceWalked + CUSTOMER_STEPS
-    averageItemsSold = averageItemsSold/10
-    averageMoneyEarned = averageMoneyEarned/10
-    averageDistanceWalked = averageDistanceWalked/10
+    averageItemsSold = averageItemsSold/100
+    averageMoneyEarned = averageMoneyEarned/100
+    averageDistanceWalked = averageDistanceWalked/100
     return np.array([averageItemsSold, averageMoneyEarned, averageDistanceWalked])
 
 def RunRandomizedSimulations():
@@ -449,15 +465,15 @@ def RunOneHundredDensitySimulations(shelves):
     averageItemsSold = 0
     averageMoneyEarned = 0.0
     averageDistanceWalked = 0
-    for i in range(10):
-        print("running simulation #" + str(i))
+    for i in range(100):
+        #print("running simulation #" + str(i))
         RunOneSimulationDensity(shelves)
         averageItemsSold = averageItemsSold + ITEMS_SOLD
         averageMoneyEarned = averageMoneyEarned + MONEY_MADE
         averageDistanceWalked = averageDistanceWalked + CUSTOMER_STEPS
-    averageItemsSold = averageItemsSold/10
-    averageMoneyEarned = averageMoneyEarned/10
-    averageDistanceWalked = averageDistanceWalked/10
+    averageItemsSold = averageItemsSold/100
+    averageMoneyEarned = averageMoneyEarned/100
+    averageDistanceWalked = averageDistanceWalked/100
     return np.array([averageItemsSold, averageMoneyEarned, averageDistanceWalked])
         
     
@@ -806,6 +822,22 @@ def TestMoveCustomer():
     if(not CUSTOMER_STEPS == 1):
         print("TestMoveCustomer Test #3 failed:")
         print("customer steps is at " + str(CUSTOMER_STEPS) + " expected 1")
+    
+    customer = createCustomer(PRIMARY_LIST, SECONDARY_LIST)
+    customer.primary_list = np.array([PRIMARY_LIST[0]])
+    customer.loc_in_env = np.array([2,3])
+    shelves = np.array([Shelf(PRIMARY_LIST[0], 2, 0), Shelf(PRIMARY_LIST[0], 2, 2)])
+    CUSTOMER_STEPS = 0
+    MoveCustomer(customer, shelves, np.array([customer]))
+    if(not customer.loc_in_env[1] == 3):
+        print("TestMoveCustomer Test #4 failed:")
+        print("customer y position is " + str(customer.loc_in_env[1]) + " expected 3")
+    if(not customer.loc_in_env[0] == 1):
+        print("TestMoveCustomer Test #5 failed:")
+        print("customer x position is " + str(customer.loc_in_env[0]) + " expected 1")
+    if(not CUSTOMER_STEPS == 1):
+        print("TestMoveCustomer Test #6 failed:")
+        print("customer steps is at " + str(CUSTOMER_STEPS) + " expected 1")
 
 def TestCustomerPurchase():
     """
@@ -969,3 +1001,27 @@ def TestCreateCustomerList():
         print("TestCreateCustomerList Test #1 failed:")
         print("customer list is " + str(customerList) + \
               " expected " + str(TOTAL_CUSTOMERS) + " customers")
+
+def TestCustomerRangeDifference():
+    """
+    TestCustomerRangeDifference
+    this function will get the average results from simulations run one 
+    hundred times where the customer view range is changed.
+    the results are printed
+    the shelves are the same between simulations
+    """
+    global VIEW_RANGE
+    shelves = createStore(shelfPositions)
+    VIEW_RANGE = 0
+    for i in range(5):
+        VIEW_RANGE = VIEW_RANGE + 1
+        averages = RunOneHundredSimulations(shelves)
+        print("For simulation with view range " + str(i + 1) + ":")
+        print("the shelf layout was...")
+        for i in shelves:
+            print(i.stock.name)
+        print("The average items sold was " + str(averages[0]) + ".")
+        print("The average money earned was " + str(averages[1]) + ".")
+        print("The average distance walked was " + str(averages[2]) + ".")
+    VIEW_RANGE = 1
+
