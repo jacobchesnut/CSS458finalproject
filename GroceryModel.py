@@ -1157,7 +1157,7 @@ def plotStoreOutput(shelves, runs):
         
     #combo = [sold,rev, dist]
     #hard coded limit might need to change
-    plt.ylim(500,700)
-    plt.plot(range(runs) + 1, sold)
-    plt.plot(range(runs) + 1, rev, 'bo')
-    plt.plot(range(runs) + 1, dist, 'go')
+    #plt.ylim(500,600)
+    plt.plot(range(runs), sold, 'ro')
+    plt.plot(range(runs), rev, 'bo')
+    plt.plot(range(runs), dist, 'go')
