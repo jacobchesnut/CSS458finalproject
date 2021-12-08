@@ -1142,3 +1142,22 @@ def TestCustomerItemDifference():
         print("The average distance walked was " + str(averages[2]) + ".")
     NUMBER_PRIMARY_LIST = 3
     NUMBER_SECONDARY_LIST = 7
+    
+#analysis
+def plotStoreOutput(shelves, runs):
+    sold = []
+    rev = []
+    dist = []
+    for i in range(runs):
+        output = RunOneHundredSimulations(shelves)
+        print(output)
+        sold.append(output[0])
+        rev.append(output[1])
+        dist.append(output[2])
+        
+    #combo = [sold,rev, dist]
+    #hard coded limit might need to change
+    plt.ylim(500,700)
+    plt.plot(range(runs) + 1, sold)
+    plt.plot(range(runs) + 1, rev, 'bo')
+    plt.plot(range(runs) + 1, dist, 'go')
