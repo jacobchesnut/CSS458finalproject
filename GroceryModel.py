@@ -1013,15 +1013,87 @@ def TestCustomerRangeDifference():
     global VIEW_RANGE
     shelves = createStore(shelfPositions)
     VIEW_RANGE = 0
+    print("the shelf layout is...")
+    for i in shelves:
+        print(i.stock.name)
     for i in range(5):
         VIEW_RANGE = VIEW_RANGE + 1
         averages = RunOneHundredSimulations(shelves)
         print("For simulation with view range " + str(i + 1) + ":")
-        print("the shelf layout was...")
-        for i in shelves:
-            print(i.stock.name)
         print("The average items sold was " + str(averages[0]) + ".")
         print("The average money earned was " + str(averages[1]) + ".")
         print("The average distance walked was " + str(averages[2]) + ".")
     VIEW_RANGE = 1
 
+def TestCustomerFlowDifference():
+    """
+    TestCustomerFlowDifference
+    this function will get the average results from simulations run one 
+    hundred times where the customer entrance rate is changed.
+    the results are printed
+    the shelves are the same between simulations
+    """
+    global DELTA_CUSTOMER
+    shelves = createStore(shelfPositions)
+    DELTA_CUSTOMER = 0
+    print("the shelf layout is...")
+    for i in shelves:
+        print(i.stock.name)
+    for i in range(10):
+        DELTA_CUSTOMER = DELTA_CUSTOMER + 1
+        averages = RunOneHundredSimulations(shelves)
+        print("For simulation with steps between customers " + str(i + 1) + ":")
+        print("The average items sold was " + str(averages[0]) + ".")
+        print("The average money earned was " + str(averages[1]) + ".")
+        print("The average distance walked was " + str(averages[2]) + ".")
+    DELTA_CUSTOMER = 5
+
+def TestCustomerTotalDifference():
+    """
+    TestCustomerTotalDifference
+    this function will get the average results from simulations run one 
+    hundred times where the number of total customers is changed.
+    the results are printed
+    the shelves are the same between simulations
+    """
+    global TOTAL_CUSTOMERS
+    shelves = createStore(shelfPositions)
+    TOTAL_CUSTOMERS = 0
+    print("the shelf layout is...")
+    for i in shelves:
+        print(i.stock.name)
+    for i in range(10):
+        TOTAL_CUSTOMERS = TOTAL_CUSTOMERS + 10
+        averages = RunOneHundredSimulations(shelves)
+        print("For simulation with total customers " + str((i + 1) * 10) + ":")
+        print("The average items sold was " + str(averages[0]) + ".")
+        print("The average money earned was " + str(averages[1]) + ".")
+        print("The average distance walked was " + str(averages[2]) + ".")
+    TOTAL_CUSTOMERS = 30
+
+def TestCustomerItemDifference():
+    """
+    TestCustomerTotalDifference
+    this function will get the average results from simulations run one 
+    hundred times where the number of items chosen per customer is changed.
+    the results are printed
+    the shelves are the same between simulations
+    """
+    global NUMBER_PRIMARY_LIST
+    global NUMBER_SECONDARY_LIST
+    shelves = createStore(shelfPositions)
+    NUMBER_PRIMARY_LIST = 0
+    NUMBER_SECONDARY_LIST = 0
+    print("the shelf layout is...")
+    for i in shelves:
+        print(i.stock.name)
+    for i in range(10):
+        NUMBER_PRIMARY_LIST = NUMBER_PRIMARY_LIST + 1
+        NUMBER_SECONDARY_LIST = NUMBER_SECONDARY_LIST + 1
+        averages = RunOneHundredSimulations(shelves)
+        print("For simulation with total items " + str((i + 1) * 2) + ":")
+        print("The average items sold was " + str(averages[0]) + ".")
+        print("The average money earned was " + str(averages[1]) + ".")
+        print("The average distance walked was " + str(averages[2]) + ".")
+    NUMBER_PRIMARY_LIST = 3
+    NUMBER_SECONDARY_LIST = 7
