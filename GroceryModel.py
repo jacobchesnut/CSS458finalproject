@@ -1236,3 +1236,6 @@ def customerStoreOutput(runs, custCount):
     
     #restore default
     TOTAL_CUSTOMERS = stored
+
+
+initItems()
