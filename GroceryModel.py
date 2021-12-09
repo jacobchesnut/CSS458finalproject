@@ -383,6 +383,7 @@ def RunOneHundredSimulations(shelves):
         averageItemsSold = averageItemsSold + ITEMS_SOLD
         averageMoneyEarned = averageMoneyEarned + MONEY_MADE
         averageDistanceWalked = averageDistanceWalked + CUSTOMER_STEPS
+        
     averageItemsSold = averageItemsSold/100
     averageMoneyEarned = averageMoneyEarned/100
     averageDistanceWalked = averageDistanceWalked/100
@@ -1144,13 +1145,15 @@ def TestCustomerItemDifference():
     NUMBER_SECONDARY_LIST = 7
     
 #analysis
-def plotStoreOutput(shelves, runs):
+def plotStoreOutput(runs):
     sold = []
     rev = []
     dist = []
     for i in range(runs):
+        shelves = createStore(shelfPositions)
         output = RunOneHundredSimulations(shelves)
         print(output)
+        print(shelves)
         sold.append(output[0])
         rev.append(output[1])
         dist.append(output[2])
