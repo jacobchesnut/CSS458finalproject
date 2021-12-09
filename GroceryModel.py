@@ -45,6 +45,8 @@ CUSTOMER_STEPS = 0
 ITEMS_SOLD = 0
 #float representing the amount of money made in the current simulation
 MONEY_MADE = 0.0
+#stores each item and its purchased amount 
+ITEMS_COUNTER = []
 
 #User-modifiable constants
 #2D array which holds the positions of all shelves in the store, 33 in total
@@ -268,6 +270,8 @@ def CustomerPurchase(customerToPurchase, storeShelves):
     """
     global ITEMS_SOLD
     global MONEY_MADE
+    global ITEMS_COUNTER
+    
     for i in storeShelves:
         distance = np.abs(customerToPurchase.loc_in_env - i.loc_in_env)
         #shelf in range
@@ -285,6 +289,7 @@ def CustomerPurchase(customerToPurchase, storeShelves):
                     #increment counters
                     ITEMS_SOLD = ITEMS_SOLD + 1
                     MONEY_MADE = MONEY_MADE + j.price
+                    ItemCounterIncrement(i.stock.name)
             for j in customerToPurchase.secondary_list:
                 #item customer wants
                 if(j.name == i.stock.name):
@@ -298,6 +303,12 @@ def CustomerPurchase(customerToPurchase, storeShelves):
                     #increment counters
                     ITEMS_SOLD = ITEMS_SOLD + 1
                     MONEY_MADE = MONEY_MADE + j.price
+                    ItemCounterIncrement(i.stock.name)
+
+def ItemCounterIncrement(inName = ''):
+    for i in ITEMS_COUNTER:
+        if i[0].name == inName:
+            i[1] += 1
 
 def RemoveCustomers(allCustomers):
     """
@@ -527,6 +538,12 @@ def initItems():
     SECONDARY_LIST.append(Item('Brownies', 1.94))
     SECONDARY_LIST.append(Item('Pizza', 6.66))  
     SECONDARY_LIST = np.array(SECONDARY_LIST)
+    
+    global ITEMS_COUNTER
+    for i in PRIMARY_LIST:
+        ITEMS_COUNTER.append([i, 0])
+    for i in SECONDARY_LIST:
+        ITEMS_COUNTER.append([i, 0])
         
 def createStore(loc = []):
     """
@@ -1146,14 +1163,58 @@ def TestCustomerItemDifference():
     
 #analysis
 def plotStoreOutput(runs):
+    
+    global ITEMS_COUNTER
     sold = []
     rev = []
     dist = []
+    
+    
+    display = []
+    pos = []
+    past = 0
+    quantity = 0
+    
     for i in range(runs):
         shelves = createStore(shelfPositions)
         output = RunOneHundredSimulations(shelves)
         print(output)
-        print(shelves)
+        
+        #print out shelves
+        for i in shelves:
+            if past == i.loc_in_env[0]:
+                
+                #determine the quantity for the named item
+                for j in ITEMS_COUNTER:
+                    if j[0].name == i.stock.name:
+                        if j[1] == 0:
+                            quantity = j[1]
+                        else:
+                            quantity = j[1] / 100
+                
+                display.append(str([i.loc_in_env[0], i.loc_in_env[1]]) + i.stock.name + str(quantity))
+                #pos.append()
+            else:
+                past += 1
+                print(display)
+                #print(pos)
+                display = []
+                pos = []
+        
+        #print out how often items were bought 
+        """
+        for i in ITEMS_COUNTER:
+            print(i[0].name)
+            if i[1] == 0:
+                print(i[1])
+            else:
+                print(i[1] / 100)
+        """
+        #Reset
+        ITEMS_COUNTER = []
+        
+         
+        
         sold.append(output[0])
         rev.append(output[1])
         dist.append(output[2])
