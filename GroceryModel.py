@@ -1192,6 +1192,11 @@ def plotStoreOutput(runs):
         #resets display
         display = []
         #print out how often items were bought 
+        
+        #reset count on itemcounter
+        for j in ITEMS_COUNTER:
+            j[1] = 0
+        
         """
         for i in ITEMS_COUNTER:
             print(i[0].name)
@@ -1254,17 +1259,13 @@ def customerStoreOutput(runs, custCount):
     TOTAL_CUSTOMERS = stored
 
 def plotStoreOutputDensity(runs):
-    
-    
+
     global ITEMS_COUNTER
     sold = []
     rev = []
     dist = []
     
-    
-    display = []
-    pos = []
-    past = 0
+
     quantity = 0
     
     for i in range(runs):
@@ -1274,38 +1275,19 @@ def plotStoreOutputDensity(runs):
         
         #print out shelves
         for i in shelves:
-            if past == i.loc_in_env[0]:
-                
-                #determine the quantity for the named item
-                for j in ITEMS_COUNTER:
-                    if j[0].name == i.stock.name:
-                        if j[1] == 0:
-                            quantity = j[1]
-                        else:
-                            quantity = j[1] / 100
-                
-                display.append(str([i.loc_in_env[0], i.loc_in_env[1]]) + i.stock.name + str(quantity))
-                #pos.append()
-            else:
-                past += 1
-                print(display)
-                #print(pos)
-                display = []
-                pos = []
+            for j in ITEMS_COUNTER:
+                if j[0].name == i.stock.name:
+                    
+                   if j[1] == 0:
+                       quantity = j[1]
+                   else:
+                       quantity = j[1] / 100
+            print(str([i.loc_in_env[0], i.loc_in_env[1]]) + " " + i.stock.name + " " + str(quantity))
+
+        #reset count on itemcounter
+        for j in ITEMS_COUNTER:
+            j[1] = 0
         
-        #print out how often items were bought 
-        """
-        for i in ITEMS_COUNTER:
-            print(i[0].name)
-            if i[1] == 0:
-                print(i[1])
-            else:
-                print(i[1] / 100)
-        """
-        #Reset
-        ITEMS_COUNTER = []
-        
-         
         
         sold.append(output[0])
         rev.append(output[1])
