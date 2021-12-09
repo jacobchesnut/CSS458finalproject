@@ -1164,6 +1164,85 @@ def TestCustomerItemDifference():
 #analysis
 def plotStoreOutput(runs):
     
+    
+    global ITEMS_COUNTER
+    sold = []
+    rev = []
+    dist = []
+    
+    
+    display = []
+    past = 0
+    quantity = 0
+    
+    for i in range(runs):
+        shelves = createStore(shelfPositions)
+        output = RunOneHundredSimulations(shelves)
+        print(output)
+        
+        #print out shelves
+        for i in shelves:
+            if past == i.loc_in_env[0]:
+                
+                #determine the quantity for the named item
+                for j in ITEMS_COUNTER:
+                    if j[0].name == i.stock.name:
+                        if j[1] == 0:
+                            quantity = j[1]
+                        else:
+                            quantity = j[1] / 100
+                
+                display.append(str([i.loc_in_env[0], i.loc_in_env[1]]) + " " + i.stock.name + " " + str(quantity))
+                #pos.append()
+            else:
+                past += 1
+                print(display)
+                #print(pos)
+                display = []
+            
+        #reset for next simulation
+        past = 0
+        quantity = 0
+        
+        #print out how often items were bought 
+        """
+        for i in ITEMS_COUNTER:
+            print(i[0].name)
+            if i[1] == 0:
+                print(i[1])
+            else:
+                print(i[1] / 100)
+        """
+        #Reset
+        ITEMS_COUNTER = []
+        
+         
+        
+        sold.append(output[0])
+        rev.append(output[1])
+        dist.append(output[2])
+        
+    #combo = [sold,rev, dist]
+    #hard coded limit might need to change
+    #plt.ylim(500,600)
+    plt.plot(range(runs), sold, 'ro')
+    plt.plot(range(runs), rev, 'bo')
+    plt.plot(range(runs), dist, 'go')
+    
+def customerStoreOutput(runs, custCount):
+    
+    global TOTAL_CUSTOMERS
+    stored = TOTAL_CUSTOMERS 
+    TOTAL_CUSTOMERS = custCount
+    
+    plotStoreOutput(runs)
+    
+    #restore default
+    TOTAL_CUSTOMERS = stored
+
+def plotStoreOutputDensity(runs):
+    
+    
     global ITEMS_COUNTER
     sold = []
     rev = []
@@ -1177,7 +1256,7 @@ def plotStoreOutput(runs):
     
     for i in range(runs):
         shelves = createStore(shelfPositions)
-        output = RunOneHundredSimulations(shelves)
+        output = RunOneHundredDensitySimulations(shelves)
         print(output)
         
         #print out shelves
@@ -1225,17 +1304,7 @@ def plotStoreOutput(runs):
     plt.plot(range(runs), sold, 'ro')
     plt.plot(range(runs), rev, 'bo')
     plt.plot(range(runs), dist, 'go')
-    
-def customerStoreOutput(runs, custCount):
-    
-    global TOTAL_CUSTOMERS
-    stored = TOTAL_CUSTOMERS 
-    TOTAL_CUSTOMERS = custCount
-    
-    plotStoreOutput(runs)
-    
-    #restore default
-    TOTAL_CUSTOMERS = stored
+
 
 
 initItems()
