@@ -1225,3 +1225,14 @@ def plotStoreOutput(runs):
     plt.plot(range(runs), sold, 'ro')
     plt.plot(range(runs), rev, 'bo')
     plt.plot(range(runs), dist, 'go')
+    
+def customerStoreOutput(runs, custCount):
+    
+    global TOTAL_CUSTOMERS
+    stored = TOTAL_CUSTOMERS 
+    TOTAL_CUSTOMERS = custCount
+    
+    plotStoreOutput(runs)
+    
+    #restore default
+    TOTAL_CUSTOMERS = stored
