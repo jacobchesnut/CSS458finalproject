@@ -1193,16 +1193,25 @@ def plotStoreOutput(runs):
                             quantity = j[1] / 100
                 
                 display.append(str([i.loc_in_env[0], i.loc_in_env[1]]) + " " + i.stock.name + " " + str(quantity))
-                #pos.append()
+                
             else:
-                past += 1
                 print(display)
+                past += 1
+                
                 #print(pos)
                 display = []
+                
+                for j in ITEMS_COUNTER:
+                    if j[0].name == i.stock.name:
+                        if j[1] == 0:
+                            quantity = j[1]
+                        else:
+                            quantity = j[1] / 100
+                
+                display.append(str([i.loc_in_env[0], i.loc_in_env[1]]) + " " + i.stock.name + " " + str(quantity))
             
         #reset for next simulation
         past = 0
-        quantity = 0
         
         #print out how often items were bought 
         """
